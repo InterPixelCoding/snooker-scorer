@@ -1,0 +1,76 @@
+.sync > img {
+    width: 1.125rem;
+}
+
+.selection-menu > * {
+    width: fit-content;
+    filter: drop-shadow(var(--drop-shadow));
+}
+
+.selection-menu > .wrapper {
+    display: flex;
+    width: 100%;
+    padding-inline: 5vw;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 5%;
+    color: white;
+}
+
+.selection-menu:not(.active) {
+    pointer-events: none;
+    opacity: 0;
+}
+
+.dropdown {
+    position: relative;
+    transition: all 250ms ease;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-mid);
+    border-radius: .25rem;
+    transform: translateY(-.25rem);
+}
+
+.dropdown > span {
+    padding: .5rem 1rem;
+    cursor: pointer;
+    font-size: 1.75rem;
+}
+
+.dropdown > span:nth-child(2n-1) {
+    background: rgb(40, 40, 40)
+}
+
+.dropdown.active {
+    overflow: auto;
+    max-height: 50vh;
+}
+
+.dropdown:not(.active) {
+    max-height: 0vh;
+    overflow: hidden;
+}
+
+.selection-menu > button {
+    margin: auto;
+    font-size: 1.75rem;
+}
+
+span.player {
+    font-size: 2.5rem;
+    overflow: hidden;
+    max-width: 100%;
+    opacity: 1;
+    transition: all 250ms ease;
+}
+
+span.player:not(.active) {
+    max-width: 0%;
+    opacity: 0;
+}
+
+button > img[src="./caret.svg"] {
+    width: .75rem;
+}

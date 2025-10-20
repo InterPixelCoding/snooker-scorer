@@ -1,0 +1,75 @@
+.portrait {
+    background: transparent;
+    align-items: center;
+}
+
+.portrait > img.logo {
+    width: 80%;
+}
+
+.portrait > .wrapper {
+    position: fixed;
+    padding: 0 3rem 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    gap: 1rem;
+    inset: 25vh 0 0 0;
+}
+
+.shot-type > *:not(.active) {
+    opacity: 0.6;
+}
+
+.wrapper > *:not(.balls) {
+    filter: drop-shadow(var(--drop-shadow))
+}
+
+.wrapper > .balls {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.balls > img {
+    width: 33%;
+    margin: -0.125rem;
+}
+
+.controls {display: flex; gap: .75rem; margin-top: -1rem}
+
+.controls > img {
+    width: 2.125rem;
+}
+
+.buttons {
+    display: grid;
+    margin-top: 1rem;
+    place-content: center;
+    gap: .5rem;
+}
+
+.buttons > button {
+    font-size: 1.5rem;
+}
+
+
+.frames > img {
+    width: 1rem;
+    opacity: 1;
+    transition: opacity 250ms ease;
+}
+
+.frames > img:not(.active) {
+    opacity: 0;
+}
+
+@media (orientation: portrait) {
+    .frames {gap: 0.25rem}
+    .frames > img {width: .75rem;}
+    .frames > img:first-of-type {margin-right: .25rem;}
+    .frames > img:last-of-type {margin-left: .25rem;}
+}

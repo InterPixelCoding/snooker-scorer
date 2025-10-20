@@ -1,0 +1,56 @@
+[
+    {
+        "username": "Silas W.", 
+        "stats": {
+            "master": {
+                "games_played": 1,
+                "total_pots": 2,
+                "break_pb": 3,
+                "frame_win_percentage": 4,
+                "pot_success_rate": 5,
+                "average_break": 6,
+                "fluke_ratio": "1/7",
+                "wheres_the_cue_ball_going": 8,
+                "safety_attack_ratio": "9/10"
+            },
+            "20-10-2025-01": {
+                "games_played": 1,
+                "total_pots": 2,
+                "break_pb": 3,
+                "frame_win_percentage": 4,
+                "pot_success_rate": 5,
+                "average_break": 6,
+                "fluke_ratio": "1/7",
+                "wheres_the_cue_ball_going": 8,
+                "safety_attack_ratio": "9/10"
+            }
+        }
+    },
+    {
+        "username": "Blake W.", 
+        "stats": {
+            "master": {
+                "games_played": 1,
+                "total_pots": 2,
+                "break_pb": 3,
+                "frame_win_percentage": 4,
+                "pot_success_rate": 5,
+                "average_break": 6,
+                "fluke_ratio": "1/7",
+                "wheres_the_cue_ball_going": 8,
+                "safety_attack_ratio": "9/10"
+            },
+            "20-10-2025-01": {
+                "games_played": 1,
+                "total_pots": 2,
+                "break_pb": 3,
+                "frame_win_percentage": 4,
+                "pot_success_rate": 5,
+                "average_break": 6,
+                "fluke_ratio": "1/7",
+                "wheres_the_cue_ball_going": 8,
+                "safety_attack_ratio": "9/10"
+            }
+        }
+    }
+]

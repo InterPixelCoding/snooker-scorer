@@ -1,0 +1,63 @@
+.landscape {
+    background: var(--interface-bg);
+    transform: translateY(0%);
+    padding-inline: 2.5rem;
+    transition: transform 500ms ease;
+    color: white;
+    gap: .5rem;
+}
+
+.landscape * {filter: drop-shadow(var(--drop-shadow))}
+
+.landscape:not(.active) {
+    transform: translateY(100vh);
+}
+
+.usernames-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.scores {
+    display: flex;
+    width: 100%;
+    padding-inline: 3rem;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.scores > .player {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    grid-template-rows: repeat(2, auto);
+}
+
+.score {
+    font-size: 12rem;
+    height: 1.125em;
+}
+
+.highest-break {
+    font-size: 1.5rem;
+}
+
+.frames {
+    font-size: 3.5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.frames > img:first-of-type {margin-right: .75rem}
+.frames > img:last-of-type {margin-left: .75rem}
+
+@media (orientation: portrait) {
+    .landscape {height: fit-content; background: transparent; gap: 0; padding-top: 4vh;}
+    .highest-break {display: none;}
+    .scores {padding-inline: 0; margin-top: -.5em;}
+    .score {font-size: 5rem; height: 1.2em}
+    .frames {font-size: 1.5rem;}
+}
