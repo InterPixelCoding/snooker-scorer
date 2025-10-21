@@ -4,11 +4,23 @@ const portrait = document.querySelector(".portrait");
 const selection_menu = document.querySelector(".selection-menu");
 
 function activate(el) {
-    el.classList.add("active")
+    if(el.length == undefined) {
+        el.classList.add("active")
+    } else {
+        el.forEach(sub_el => {
+            sub_el.classList.add("active")
+        })
+    }
 }
 
 function deactivate(el) {
-    el.classList.add("active")
+    if(el.length == undefined) {
+        el.classList.remove("active")
+    } else {
+        el.forEach(sub_el => {
+            sub_el.classList.remove("active")
+        })
+    }
 }
 
 function modal(text) {
@@ -70,34 +82,79 @@ async function sync() {
 
 function initiate_dropdowns(json) {
     dropdowns.forEach(dropdown => {
-        for(let i = 0; i<json.length; i++) {
-            let username = json[i].username;
-            const player_span = document.createElement("span");
-            player_span.textContent = username;
-            dropdown.appendChild(player_span)
+        if(!dropdown.classList.contains("who-breaks")) {
+            for(let i = 0; i<json.length; i++) {
+                const player_span = document.createElement("span");
+                let username = json[i].username;
+                player_span.textContent = username;
+                dropdown.appendChild(player_span)
+            }
         }
-    })
+    });
+}
+
+function deactivate_other_dropdowns() {
+    let players = [...document.querySelectorAll("span.player")].map(player => player.textContent);
+    const dropdown = document.querySelector(".dropdown.who-breaks")
+    if(players.includes('')) {
+        modal("You must select both players before choosing who breaks!")
+    } else if (players[0] === players [1]) {
+        modal("Please select two different players!")
+    } else if (Array.from(document.querySelectorAll(".dropdown.who-breaks > span")).length < 2) {
+        players.forEach(player => {
+            const player_span = document.createElement("span");
+            player_span.textContent = player;
+            dropdown.appendChild(player_span)
+        });
+        deactivate(document.querySelectorAll(".dropdown:not(.who-breaks)"));
+    } else {
+        deactivate(document.querySelectorAll(".dropdown:not(.who-breaks)"));
+    }
 }
 
 async function selection_menu_logic() {
     const start_session = document.querySelector(".start-session");
     let player_indexes = [];
+    let who_breaks;
+
+    document.querySelector(".toss").onclick = () => {
+        if (player_indexes.length < 2) {
+            modal("Please select the players before you toss the coin!");
+        } else {
+            let random = Math.round(Math.random());
+            who_breaks = document.querySelectorAll("span.player")[random].textContent;
+            modal(`${who_breaks} has won the toss`);
+        }
+
+    }
 
     dropdowns.forEach(function(dropdown, index) {
         const btn = dropdown.parentElement.querySelector("button");
         const player_span = document.querySelectorAll("span.player")[index];
 
         btn.onclick = () => {
-            dropdown.classList.toggle("active");
+            if(btn.classList.contains("who-breaks-button")) {
+                setTimeout(() => {
+                    dropdown.classList.toggle("active")
+                }, 125);
+            } else {
+                dropdown.classList.toggle("active")
+            }
         };
 
         dropdown.addEventListener("click", (e) => {
-            let player_index = Array.from(dropdown.children).indexOf(e.target);
-            player_indexes[index] = player_index;
-            player_span.textContent = e.target.textContent;
-            player_span.classList.add("active");
+            if(e.target.parentElement.classList.contains("who-breaks")) {
+                who_breaks = e.target.textContent;
+            } else {
+                let player_index = Array.from(dropdown.children).indexOf(e.target);
+                player_indexes[index] = player_index;
+                player_span.textContent = e.target.textContent;
+                activate(player_span)
+            }
         });
     });
+
+    document.querySelector(".who-breaks-button").addEventListener("click", deactivate_other_dropdowns);
 
     return new Promise((resolve) => {
         start_session.onclick = () => {
@@ -105,10 +162,14 @@ async function selection_menu_logic() {
                 modal("Please select each player using the dropdown menus");
             } else if (player_indexes[0] === player_indexes[1]) {
                 modal("Please select two different players to start the session");
-            } else {
+            } else if (who_breaks == undefined) {
+                modal("Please select who breaks");
+            }
+            else {
                 const players_arr = Array.from(document.querySelectorAll("span.player"))
                     .map(item => item.textContent);
-
+                players_arr.push(who_breaks);
+                console.log(players_arr)
                 resolve(players_arr);
             }
         };

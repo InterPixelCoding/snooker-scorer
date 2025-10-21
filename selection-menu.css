@@ -74,3 +74,15 @@ span.player:not(.active) {
 button > img[src="./caret.svg"] {
     width: .75rem;
 }
+
+.decide {
+    width: 100%;
+    font-size: 1.5rem;
+    padding-block: .5rem;
+    justify-content: center;
+    color: white;
+    gap: .5rem;
+    display: flex;
+}
+
+.decide > * {height: fit-content}
