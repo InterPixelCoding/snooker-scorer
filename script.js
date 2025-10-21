@@ -218,8 +218,16 @@ function update_score(current_player, value) {
     scores[current_player].textContent = value
 }
 
-function switch_carets() {
-    document.querySelectorAll(".player-indicator").forEach(caret => {caret.classList.toggle("active")})
+function switch_carets(player_index = null) {
+    const carets = document.querySelectorAll(".player-indicator");
+    if (player_index !== null) {
+        carets.forEach((caret, index) => {
+            caret.classList.toggle("active", index === player_index);
+        });
+    } 
+    else {
+        carets.forEach(caret => caret.classList.toggle("active"));
+    }
 }
 
 function update_score_history(scores, current_player) {
@@ -228,7 +236,9 @@ function update_score_history(scores, current_player) {
     console.log(score_history);
 }
 
-let score_history;
+function average(x,y) {return (x+y)/2}
+
+let score_history = [];
 let history_index = 0;
 
 function start_match(players, frames_count, frames_arr) {
@@ -236,81 +246,105 @@ function start_match(players, frames_count, frames_arr) {
     let scores = [0, 0];
     let current_player = players.indexOf(players[2]);
     score_history = [[0, 0, current_player]];
+    history_index = 0;
     players.pop();
+
+    // Initialise JSON objects
+    let match_stats = {
+        "players": players,
+        "winner": null
+    };
+
+    let p1_stats = {
+
+    };
+    
+    let p2_stats = {};
+
 
     initialise_scores(usernames, players, current_player, frames_count, frames_arr);
     
     balls.addEventListener("click", (e) => {
-        let shot = (Array.from(shot_type.children).filter(type => {return type.classList.contains("active")}))[0].textContent;
+        let shot = (Array.from(shot_type.children)
+            .filter(type => type.classList.contains("active")))[0].textContent;
+
         let colour = e.target.classList[0];
-        let ball_value = (ball_values.find(ball => ball.colour === colour)).value;
+        let ball_value = (ball_values.find(ball => ball.colour === colour))?.value ?? null;
 
-        if(colour === "safety") {
+        // === SCORING LOGIC ===
+        if (colour === "safety") {
             current_player = Math.abs(1 - current_player);
             switch_carets();
+            return;
         }
 
-        if(shot === "Pot") {
-            scores[current_player] += ball_value; 
-            history_index++;
-            console.log(history_index + 1, score_history.length)
-            score_history.splice(history_index + 1, score_history.length);
+        if (shot === "Pot") {
+            scores[current_player] += ball_value;
             update_score(current_player, scores[current_player]);
-            update_score_history(scores, current_player);
-            if(ball_value == null) {
-                current_player = Math.abs(1 - current_player);
-                scores[current_player] += 4;
-                update_score(current_player, scores[current_player])
-                switch_carets();
-                // ! Where's the cue ball going!
-            }
+
         } else if (shot === "Miss") {
-            history_index++;
             current_player = Math.abs(1 - current_player);
             switch_carets();
+
         } else if (shot === "Foul") {
-            history_index++;
-            if(ball_value === 1) ball_value = 4;
+            if (ball_value === 1) ball_value = 4;
             current_player = Math.abs(1 - current_player);
             scores[current_player] += ball_value;
-            update_score(current_player, scores[current_player])
+            update_score(current_player, scores[current_player]);
             switch_carets();
+
         } else if (shot === "Fluke") {
-            history_index++;
             scores[current_player] += ball_value;
             update_score(current_player, scores[current_player]);
         }
-        
-        
+
+        // === HISTORY MANAGEMENT ===
+        score_history.splice(history_index + 1); // remove future states
+        score_history.push([...scores, current_player]); // push new snapshot
+        history_index++;
+
+        console.log("History:", score_history);
     });
 
     shot_type.addEventListener("click", (e) => {
         const spans = Array.from(document.querySelectorAll(".shot-type > span"));
-        if(spans.includes(e.target)) {
+        if (spans.includes(e.target)) {
             deactivate(document.querySelector(".shot-type > span.active"));
             activate(e.target);
 
             let shot = e.target.textContent;
-            if(shot !== "Pot") {
-                deactivate(document.querySelector(".white"))
-            } else {
-                activate(document.querySelector(".white"))
-            }
+            if (shot !== "Pot") deactivate(document.querySelector(".white"));
+            else activate(document.querySelector(".white"));
 
-            if(shot === "Foul") {
-                deactivate(document.querySelector(".safety"))
-            } else {
-                activate(document.querySelector(".safety"))
-            }
+            if (shot === "Foul") deactivate(document.querySelector(".safety"));
+            else activate(document.querySelector(".safety"));
         }
     });
 
+    // === UNDO / REDO ===
     undo.onclick = () => {
-        history_index--;
-        scores = score_history[history_index];
-        update_score(scores[2], scores[(scores[2])])
-    }
+        if (history_index > 0) {
+            history_index--;
+            let [p1, p2, player] = score_history[history_index];
+            scores = [p1, p2];
+            current_player = player;
+            update_score(0, p1);
+            update_score(1, p2);
+            switch_carets(current_player);
+        }
+    };
 
+    redo.onclick = () => {
+        if (history_index < score_history.length - 1) {
+            history_index++;
+            let [p1, p2, player] = score_history[history_index];
+            scores = [p1, p2];
+            current_player = player;
+            update_score(0, p1);
+            update_score(1, p2);
+            switch_carets(current_player);
+        }
+    };
 }
 
 function main_session(players, json) {
