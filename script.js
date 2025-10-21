@@ -5,6 +5,8 @@ const selection_menu = document.querySelector(".selection-menu");
 const balls = document.querySelector(".balls");
 const shot_type = document.querySelector(".shot-type");
 const scores = document.querySelectorAll(".player > span.score");
+const undo = document.querySelector(".undo");
+const redo = document.querySelector(".redo");
 const ball_values = [
     { colour: "red", value: 1 },
     { colour: "yellow", value: 2 },
@@ -220,12 +222,22 @@ function switch_carets() {
     document.querySelectorAll(".player-indicator").forEach(caret => {caret.classList.toggle("active")})
 }
 
+function update_score_history(scores, current_player) {
+    let new_log = [scores[0], scores[1], current_player];
+    score_history.push(new_log);
+    console.log(score_history);
+}
+
+let score_history;
+let history_index = 0;
+
 function start_match(players, frames_count, frames_arr) {
     const usernames = document.querySelectorAll(".usernames-container > span");
     let scores = [0, 0];
     let current_player = players.indexOf(players[2]);
-    console.log(current_player);
+    score_history = [[0, 0, current_player]];
     players.pop();
+
     initialise_scores(usernames, players, current_player, frames_count, frames_arr);
     
     balls.addEventListener("click", (e) => {
@@ -240,7 +252,11 @@ function start_match(players, frames_count, frames_arr) {
 
         if(shot === "Pot") {
             scores[current_player] += ball_value; 
+            history_index++;
+            console.log(history_index + 1, score_history.length)
+            score_history.splice(history_index + 1, score_history.length);
             update_score(current_player, scores[current_player]);
+            update_score_history(scores, current_player);
             if(ball_value == null) {
                 current_player = Math.abs(1 - current_player);
                 scores[current_player] += 4;
@@ -249,15 +265,18 @@ function start_match(players, frames_count, frames_arr) {
                 // ! Where's the cue ball going!
             }
         } else if (shot === "Miss") {
+            history_index++;
             current_player = Math.abs(1 - current_player);
             switch_carets();
         } else if (shot === "Foul") {
+            history_index++;
             if(ball_value === 1) ball_value = 4;
             current_player = Math.abs(1 - current_player);
             scores[current_player] += ball_value;
             update_score(current_player, scores[current_player])
             switch_carets();
         } else if (shot === "Fluke") {
+            history_index++;
             scores[current_player] += ball_value;
             update_score(current_player, scores[current_player]);
         }
@@ -285,6 +304,12 @@ function start_match(players, frames_count, frames_arr) {
             }
         }
     });
+
+    undo.onclick = () => {
+        history_index--;
+        scores = score_history[history_index];
+        update_score(scores[2], scores[(scores[2])])
+    }
 
 }
 
