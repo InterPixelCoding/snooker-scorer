@@ -34,6 +34,10 @@ button {
     cursor: pointer;
 }
 
+button:disabled {
+    color: rgba(255,255,255,0.3)
+}
+
 .modal-container {
     position: fixed;
     inset: 0;
@@ -43,6 +47,8 @@ button {
     font-size: 1.75rem;
     color: white;
     display: grid;
+    text-align: center;
+    padding-inline: 2.5rem;
     font-weight: 100;
     place-content: center;
     place-items: center;
@@ -73,13 +79,6 @@ button {
 @keyframes spin {
     from {transform: rotate(0deg);}
     to {transform: rotate(1080deg);}
-}
-
-@media (orientation: portrait) {
-    .selection-menu {
-        opacity: 0;
-        pointer-events: none;
-    }
 }
 
 @media (orientation: landscape) {

@@ -3,6 +3,11 @@
     align-items: center;
 }
 
+.portrait:not(.active) {
+    opacity: 0;
+    pointer-events: none;
+}
+
 .portrait > img.logo {
     width: 80%;
 }
@@ -66,6 +71,8 @@
 .frames > img:not(.active) {
     opacity: 0;
 }
+
+.balls > *:not(.active) {display: none;}
 
 @media (orientation: portrait) {
     .frames {gap: 0.25rem}

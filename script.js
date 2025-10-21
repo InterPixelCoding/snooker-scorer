@@ -2,24 +2,47 @@ const dropdowns = document.querySelectorAll(".selection-menu .dropdown");
 const landscape = document.querySelector(".landscape");
 const portrait = document.querySelector(".portrait");
 const selection_menu = document.querySelector(".selection-menu");
+const balls = document.querySelector(".balls");
+const shot_type = document.querySelector(".shot-type");
+const scores = document.querySelectorAll(".player > span.score");
+const ball_values = [
+    { colour: "red", value: 1 },
+    { colour: "yellow", value: 2 },
+    { colour: "green", value: 3 },
+    { colour: "brown", value: 4 },
+    { colour: "blue", value: 5 },
+    { colour: "pink", value: 6 },
+    { colour: "black", value: 7 },
+    { colour: "white", value: null },
+    { colour: "safety", value: 0 },
+];
 
 function activate(el) {
-    if(el.length == undefined) {
-        el.classList.add("active")
+    if(el) {
+        if(el.length == undefined) {
+            el.classList.add("active")
+        } else {
+            el.forEach(sub_el => {
+                sub_el.classList.add("active")
+            })
+        }
     } else {
-        el.forEach(sub_el => {
-            sub_el.classList.add("active")
-        })
+        console.error(el, " not defined!")
     }
+    
 }
 
 function deactivate(el) {
-    if(el.length == undefined) {
-        el.classList.remove("active")
+    if(el) {
+        if(el.length == undefined) {
+            el.classList.remove("active")
+        } else {
+            el.forEach(sub_el => {
+                sub_el.classList.remove("active")
+            })
+        } 
     } else {
-        el.forEach(sub_el => {
-            sub_el.classList.remove("active")
-        })
+        console.error(el, " not defined!")
     }
 }
 
@@ -80,7 +103,7 @@ async function sync() {
     });
 }
 
-function initiate_dropdowns(json) {
+function initialise_dropdowns(json) {
     dropdowns.forEach(dropdown => {
         if(!dropdown.classList.contains("who-breaks")) {
             for(let i = 0; i<json.length; i++) {
@@ -169,34 +192,106 @@ async function selection_menu_logic() {
                 const players_arr = Array.from(document.querySelectorAll("span.player"))
                     .map(item => item.textContent);
                 players_arr.push(who_breaks);
-                console.log(players_arr)
                 resolve(players_arr);
             }
         };
     });
 }
 
-function initialise_scores(usernames, total_frames, players, frames_count, frames_arr) {
+function initialise_scores(usernames, players, current_player, frames_count, frames_arr) {
     usernames.forEach(function(username, index) {username.textContent = players[index].username});
-    document.querySelector(".player-1-frames").textContent = frames_arr[0];
-    document.querySelector(".player-2-frames").textContent = frames_arr[1];
-    document.querySelector(".total-frames").textContent = `(${frames_count})`;
+    const player_1_frames = document.querySelector(".player-1-frames");
+    const player_2_frames = document.querySelector(".player-2-frames");
+    const total_frames = document.querySelector(".total-frames");
+
+    player_1_frames.textContent = frames_arr[0];
+    player_2_frames.textContent = frames_arr[1];
+    total_frames.textContent = `(${frames_count})`;
+
+    const carets = [document.querySelector(".left-caret"), document.querySelector(".right-caret")]
+    activate(carets[current_player]);
+}
+
+function update_score(current_player, value) {
+    scores[current_player].textContent = value
+}
+
+function switch_carets() {
+    document.querySelectorAll(".player-indicator").forEach(caret => {caret.classList.toggle("active")})
 }
 
 function start_match(players, frames_count, frames_arr) {
     const usernames = document.querySelectorAll(".usernames-container > span");
-    const total_frames = document.querySelectorAll(".frames > *");
     let scores = [0, 0];
-    initialise_scores(usernames, total_frames, players, frames_count, frames_arr);
-
+    let current_player = players.indexOf(players[2]);
+    console.log(current_player);
+    players.pop();
+    initialise_scores(usernames, players, current_player, frames_count, frames_arr);
     
+    balls.addEventListener("click", (e) => {
+        let shot = (Array.from(shot_type.children).filter(type => {return type.classList.contains("active")}))[0].textContent;
+        let colour = e.target.classList[0];
+        let ball_value = (ball_values.find(ball => ball.colour === colour)).value;
+
+        if(colour === "safety") {
+            current_player = Math.abs(1 - current_player);
+            switch_carets();
+        }
+
+        if(shot === "Pot") {
+            scores[current_player] += ball_value; 
+            update_score(current_player, scores[current_player]);
+            if(ball_value == null) {
+                current_player = Math.abs(1 - current_player);
+                scores[current_player] += 4;
+                update_score(current_player, scores[current_player])
+                switch_carets();
+                // ! Where's the cue ball going!
+            }
+        } else if (shot === "Miss") {
+            current_player = Math.abs(1 - current_player);
+            switch_carets();
+        } else if (shot === "Foul") {
+            if(ball_value === 1) ball_value = 4;
+            current_player = Math.abs(1 - current_player);
+            scores[current_player] += ball_value;
+            update_score(current_player, scores[current_player])
+            switch_carets();
+        } else if (shot === "Fluke") {
+            scores[current_player] += ball_value;
+            update_score(current_player, scores[current_player]);
+        }
+        
+        
+    });
+
+    shot_type.addEventListener("click", (e) => {
+        const spans = Array.from(document.querySelectorAll(".shot-type > span"));
+        if(spans.includes(e.target)) {
+            deactivate(document.querySelector(".shot-type > span.active"));
+            activate(e.target);
+
+            let shot = e.target.textContent;
+            if(shot !== "Pot") {
+                deactivate(document.querySelector(".white"))
+            } else {
+                activate(document.querySelector(".white"))
+            }
+
+            if(shot === "Foul") {
+                deactivate(document.querySelector(".safety"))
+            } else {
+                activate(document.querySelector(".safety"))
+            }
+        }
+    });
 
 }
 
 function main_session(players, json) {
     let frames_count = 0; frames_arr = [0, 0];
     let session_players = []; players.forEach(player => {for(let i = 0; i<json.length; i++) {if(player === json[i].username) {session_players.push(json[i]);}}})
-    activate(landscape);
+    activate([landscape, portrait]);
     deactivate(selection_menu);
 
     frames_count++;
@@ -206,7 +301,7 @@ function main_session(players, json) {
 
 window.addEventListener("DOMContentLoaded", () => {
     let json = JSON.parse(localStorage.getItem("snooker_scorer_json"));
-    initiate_dropdowns(json);
+    initialise_dropdowns(json);
     selection_menu_logic(json)
     .then(players => main_session(players, json));
 });

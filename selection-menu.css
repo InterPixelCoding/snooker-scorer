@@ -86,3 +86,9 @@ button > img[src="./caret.svg"] {
 }
 
 .decide > * {height: fit-content}
+
+@media (orientation: portrait) {
+    .wrapper {
+        flex-direction: column;
+    }
+}
