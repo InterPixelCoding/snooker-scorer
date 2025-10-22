@@ -478,7 +478,7 @@ function start_match(players, frames_count, frames_arr) {
             );
             player.wheres_the_cue_ball_going = wtcbg_val + safe(obj.wheres_the_cue_ball_going);
             player.safety_attack_ratio = Math.min(
-                ((safeties_val / hits_val) + safe(obj.safety_attack_ratio)) / 2,
+                (safe(safeties_val / hits_val) + safe(obj.safety_attack_ratio)) / 2,
                 1
             );
         });
