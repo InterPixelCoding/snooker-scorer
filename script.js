@@ -9,6 +9,7 @@ const undo = document.querySelector(".undo");
 const redo = document.querySelector(".redo");
 const end_match = document.querySelector(".end-match");
 const end_session = document.querySelector(".end-session");
+const highest_break_spans = document.querySelectorAll(".highest-break");
 const ball_values = [
     { colour: "red", value: 1 },
     { colour: "yellow", value: 2 },
@@ -216,8 +217,12 @@ function initialise_scores(usernames, players, current_player, frames_count, fra
     activate(carets[current_player]);
 }
 
-function update_score(current_player, value) {
-    scores[current_player].textContent = value
+function update_score(current_player, value, highest_breaks) {
+    console.log(highest_breaks)
+    scores[current_player].textContent = value;
+    highest_break_spans.forEach(function(span, index) {
+        span.textContent = `Highest Break: ${highest_breaks[index]}`;
+    })
 }
 
 function switch_carets(player_index = null) {
@@ -301,18 +306,17 @@ function start_match(players, frames_count, frames_arr) {
         let ball_value = (ball_values.find(ball => ball.colour === colour))?.value ?? null;
 
         // === SCORING LOGIC ===
-        if(["Pot", "Miss", "Foul", "Fluke"].includes(shot)) {
-            
-
+        if (["Pot", "Miss", "Foul", "Fluke"].includes(shot)) {
             if (colour === "safety") {
-                current_player = Math.abs(1 - current_player);
-                safeties[current_player]++;
-                if(break_value > 0) {
+                // Safety = switch turn, end current break if active
+                if (break_value > 0) {
+                    highest_breaks[current_player] = Math.max(highest_breaks[current_player], break_value);
                     average_break[current_player] = calculate_average_break(current_player, breaks, average_break, break_value);
-                    console.log(average_break[current_player]); 
                     breaks[current_player]++;
-                    break_value = 0; 
+                    break_value = 0;
                 }
+                safeties[current_player]++;
+                current_player = Math.abs(1 - current_player);
                 switch_carets();
                 return;
             } else {
@@ -320,52 +324,70 @@ function start_match(players, frames_count, frames_arr) {
             }
 
             if (shot === "Pot") {
-                if(ball_value == null) { 
-                    current_player = Math.abs(1 - current_player); 
-                    scores[current_player] += 4; update_score(current_player, scores[current_player]);
-                    switch_carets();  
+                if (ball_value == null) { 
+                    // Illegal pot (e.g., potting white) — foul, give 4 points to opponent
+                    scores[Math.abs(1 - current_player)] += 4; 
+                    update_score(Math.abs(1 - current_player), scores[Math.abs(1 - current_player)], highest_breaks);
                     wtcbg[current_player]++;
-                    
+                    // End break and switch
+                    if (break_value > 0) {
+                        highest_breaks[current_player] = Math.max(highest_breaks[current_player], break_value);
+                        average_break[current_player] = calculate_average_break(current_player, breaks, average_break, break_value);
+                        breaks[current_player]++;
+                        break_value = 0;
+                    }
+                    current_player = Math.abs(1 - current_player); 
+                    switch_carets();
                 } else {
+                    // Normal pot
                     break_value += ball_value;
                     scores[current_player] += ball_value;
-                    update_score(current_player, scores[current_player]);
                     pots[current_player]++;
+                    update_score(current_player, scores[current_player], highest_breaks);
                 }
 
             } else if (shot === "Miss") {
-                current_player = Math.abs(1 - current_player);
-                misses[current_player]++;
-
-                // Update Avg Breaks, Max Breaks
-                highest_breaks[current_player] = Math.max((highest_breaks[current_player], break_value));
-                average_break[current_player] = calculate_average_break(current_player, breaks, average_break, break_value);
-                console.log(average_break[current_player]); 
-                break_value = 0; 
+                // Miss ends the current break
+                highest_breaks[current_player] = Math.max(highest_breaks[current_player], break_value);
+                average_break[current_player] = calculate_average_break(current_player, breaks, average_break, break_value); 
                 breaks[current_player]++;
-
+                misses[current_player]++;
+                break_value = 0;
+                // Switch turn
+                current_player = Math.abs(1 - current_player);
                 switch_carets();
 
             } else if (shot === "Foul") {
-                if (ball_value === 1) ball_value = 4;
+                // Foul gives points to the opponent
+                if (ball_value == 1) ball_value = 4;
+                scores[Math.abs(1 - current_player)] += ball_value;
+                update_score(Math.abs(1 - current_player), scores[Math.abs(1 - current_player)], highest_breaks);
+
+                // End current break
+                if (break_value > 0) {
+                    highest_breaks[current_player] = Math.max(highest_breaks[current_player], break_value);
+                    average_break[current_player] = calculate_average_break(current_player, breaks, average_break, break_value);
+                    breaks[current_player]++;
+                    break_value = 0;
+                }
+
                 current_player = Math.abs(1 - current_player);
-                scores[current_player] += ball_value;
-                update_score(current_player, scores[current_player]);
-                average_break[current_player] = (break_value + average_break[current_player]) / 2; console.log(average_break[current_player]); break_value = 0; 
                 switch_carets();
 
             } else if (shot === "Fluke") {
+                // A fluke counts as a successful pot
                 scores[current_player] += ball_value;
-                average_break[current_player] += ball_value;
+                break_value += ball_value;
                 flukes[current_player]++;
-                update_score(current_player, scores[current_player]);
+                update_score(current_player, scores[current_player], highest_breaks);
             }
 
             // === HISTORY MANAGEMENT ===
             score_history.splice(history_index + 1); // remove future states
-            score_history.push([...scores, current_player]); // push new snapshot
+            score_history.push([...scores, current_player]);
             history_index++;
         }
+
     })
 
     shot_type.addEventListener("click", (e) => {
@@ -390,8 +412,8 @@ function start_match(players, frames_count, frames_arr) {
             let [p1, p2, player] = score_history[history_index];
             scores = [p1, p2];
             current_player = player;
-            update_score(0, p1);
-            update_score(1, p2);
+            update_score(0, p1, highest_breaks);
+            update_score(1, p2, highest_breaks);
             switch_carets(current_player);
         }
     };
@@ -402,13 +424,21 @@ function start_match(players, frames_count, frames_arr) {
             let [p1, p2, player] = score_history[history_index];
             scores = [p1, p2];
             current_player = player;
-            update_score(0, p1);
-            update_score(1, p2);
+            update_score(0, p1, highest_breaks);
+            update_score(1, p2, highest_breaks);
             switch_carets(current_player);
         }
     };
 
     end_match.onclick = () => {
+
+        const winner_index = scores.indexOf(Math.max(...scores))
+        winner[winner_index] = 1;
+
+        match_stats.players = [players[0].username, players[1].username];
+        match_stats.score = scores;
+        match_stats.winner = players[winner_index].username;
+
         stats_arr.forEach((player, index) => {
             const obj = players[index].stats.master;
 
@@ -422,18 +452,21 @@ function start_match(players, frames_count, frames_arr) {
             const safeties_val = safe(safeties[index]);
             const hits_val = Math.max(safe(hits[index]), 1);
             const winner_val = safe(winner[index]);
-
+            
             player.games_played = safe(obj.games_played) + 1;
-            player.total_pots = safe(obj.total_pots) + pots_val;
             player.break_pb = Math.max(highest_break_val, safe(obj.break_pb));
             player.frame_win_percentage = Math.min(
                 (safe(obj.games_won) + winner_val) / Math.max(player.games_played, 1),
                 1
             );
+                
             player.pot_success_rate = Math.min(
-                (safe(obj.pot_success_rate) + pots_val / Math.max(pots_val + misses_val, 1)) / 2,
+                (safe(obj.pot_success_rate) * safe(obj.total_pots) + pots_val) / safe(obj.total_pots + pots_val + misses_val),
                 1
             );
+                
+            player.total_pots = safe(obj.total_pots) + pots_val;
+            
             if(player.average_break > 0) {
                 player.average_break = (safe(obj.average_break) + avg_break_val) / 2;
             } else {
@@ -449,11 +482,11 @@ function start_match(players, frames_count, frames_arr) {
                 1
             );
         });
-        console.log(stats_arr);
+        console.log(stats_arr, match_stats);
     };
 
 
-}``
+}
 
 function main_session(players, json) {
     let frames_count = 0; frames_arr = [0, 0];
