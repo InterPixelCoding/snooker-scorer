@@ -7,6 +7,8 @@ const shot_type = document.querySelector(".shot-type");
 const scores = document.querySelectorAll(".player > span.score");
 const undo = document.querySelector(".undo");
 const redo = document.querySelector(".redo");
+const end_match = document.querySelector(".end-match");
+const end_session = document.querySelector(".end-session");
 const ball_values = [
     { colour: "red", value: 1 },
     { colour: "yellow", value: 2 },
@@ -233,17 +235,34 @@ function switch_carets(player_index = null) {
 function update_score_history(scores, current_player) {
     let new_log = [scores[0], scores[1], current_player];
     score_history.push(new_log);
-    console.log(score_history);
+}
+
+function calculate_average_break(current_player, breaks, average_break, current_break) {
+    const prev_break_average = average_break[current_player];
+    return ((prev_break_average * breaks[current_player]) + current_break) / (breaks[current_player] + 1);
 }
 
 function average(x,y) {return (x+y)/2}
 
 let score_history = [];
 let history_index = 0;
+let break_value = 0;
 
 function start_match(players, frames_count, frames_arr) {
     const usernames = document.querySelectorAll(".usernames-container > span");
+
     let scores = [0, 0];
+    let highest_breaks = [0,0];
+    let flukes = [0,0];
+    let breaks = [0,0];
+    let average_break = [0,0];
+    let pots = [0,0];
+    let misses = [0,0];
+    let hits = [0,0];
+    let safeties = [0,0];
+    let wtcbg = [0,0];
+    let winner = [0,0]; // 1 = winner, 0 = loser
+
     let current_player = players.indexOf(players[2]);
     score_history = [[0, 0, current_player]];
     history_index = 0;
@@ -252,15 +271,25 @@ function start_match(players, frames_count, frames_arr) {
     // Initialise JSON objects
     let match_stats = {
         "players": players,
+        "score": scores,
         "winner": null
     };
 
-    let p1_stats = {
-
+    const empty_arr = {
+        "games_played": 0,
+        "total_pots": 0,
+        "break_pb": 0,
+        "frame_win_percentage": 0,
+        "pot_success_rate": 0,
+        "average_break": 0,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0
     };
-    
-    let p2_stats = {};
 
+    let p1_stats = {...empty_arr}; let p2_stats = {...empty_arr};
+
+    let stats_arr = [p1_stats, p2_stats];
 
     initialise_scores(usernames, players, current_player, frames_count, frames_arr);
     
@@ -272,39 +301,72 @@ function start_match(players, frames_count, frames_arr) {
         let ball_value = (ball_values.find(ball => ball.colour === colour))?.value ?? null;
 
         // === SCORING LOGIC ===
-        if (colour === "safety") {
-            current_player = Math.abs(1 - current_player);
-            switch_carets();
-            return;
+        if(["Pot", "Miss", "Foul", "Fluke"].includes(shot)) {
+            
+
+            if (colour === "safety") {
+                current_player = Math.abs(1 - current_player);
+                safeties[current_player]++;
+                if(break_value > 0) {
+                    average_break[current_player] = calculate_average_break(current_player, breaks, average_break, break_value);
+                    console.log(average_break[current_player]); 
+                    breaks[current_player]++;
+                    break_value = 0; 
+                }
+                switch_carets();
+                return;
+            } else {
+                hits[current_player]++;
+            }
+
+            if (shot === "Pot") {
+                if(ball_value == null) { 
+                    current_player = Math.abs(1 - current_player); 
+                    scores[current_player] += 4; update_score(current_player, scores[current_player]);
+                    switch_carets();  
+                    wtcbg[current_player]++;
+                    
+                } else {
+                    break_value += ball_value;
+                    scores[current_player] += ball_value;
+                    update_score(current_player, scores[current_player]);
+                    pots[current_player]++;
+                }
+
+            } else if (shot === "Miss") {
+                current_player = Math.abs(1 - current_player);
+                misses[current_player]++;
+
+                // Update Avg Breaks, Max Breaks
+                highest_breaks[current_player] = Math.max((highest_breaks[current_player], break_value));
+                average_break[current_player] = calculate_average_break(current_player, breaks, average_break, break_value);
+                console.log(average_break[current_player]); 
+                break_value = 0; 
+                breaks[current_player]++;
+
+                switch_carets();
+
+            } else if (shot === "Foul") {
+                if (ball_value === 1) ball_value = 4;
+                current_player = Math.abs(1 - current_player);
+                scores[current_player] += ball_value;
+                update_score(current_player, scores[current_player]);
+                average_break[current_player] = (break_value + average_break[current_player]) / 2; console.log(average_break[current_player]); break_value = 0; 
+                switch_carets();
+
+            } else if (shot === "Fluke") {
+                scores[current_player] += ball_value;
+                average_break[current_player] += ball_value;
+                flukes[current_player]++;
+                update_score(current_player, scores[current_player]);
+            }
+
+            // === HISTORY MANAGEMENT ===
+            score_history.splice(history_index + 1); // remove future states
+            score_history.push([...scores, current_player]); // push new snapshot
+            history_index++;
         }
-
-        if (shot === "Pot") {
-            scores[current_player] += ball_value;
-            update_score(current_player, scores[current_player]);
-
-        } else if (shot === "Miss") {
-            current_player = Math.abs(1 - current_player);
-            switch_carets();
-
-        } else if (shot === "Foul") {
-            if (ball_value === 1) ball_value = 4;
-            current_player = Math.abs(1 - current_player);
-            scores[current_player] += ball_value;
-            update_score(current_player, scores[current_player]);
-            switch_carets();
-
-        } else if (shot === "Fluke") {
-            scores[current_player] += ball_value;
-            update_score(current_player, scores[current_player]);
-        }
-
-        // === HISTORY MANAGEMENT ===
-        score_history.splice(history_index + 1); // remove future states
-        score_history.push([...scores, current_player]); // push new snapshot
-        history_index++;
-
-        console.log("History:", score_history);
-    });
+    })
 
     shot_type.addEventListener("click", (e) => {
         const spans = Array.from(document.querySelectorAll(".shot-type > span"));
@@ -345,7 +407,53 @@ function start_match(players, frames_count, frames_arr) {
             switch_carets(current_player);
         }
     };
-}
+
+    end_match.onclick = () => {
+        stats_arr.forEach((player, index) => {
+            const obj = players[index].stats.master;
+
+            const safe = v => Number.isFinite(v) ? v : 0;
+            const pots_val = safe(pots[index]);
+            const misses_val = safe(misses[index]);
+            const highest_break_val = safe(highest_breaks[index]);
+            const avg_break_val = safe(average_break[index]);
+            const flukes_val = safe(flukes[index]);
+            const wtcbg_val = safe(wtcbg[index]);
+            const safeties_val = safe(safeties[index]);
+            const hits_val = Math.max(safe(hits[index]), 1);
+            const winner_val = safe(winner[index]);
+
+            player.games_played = safe(obj.games_played) + 1;
+            player.total_pots = safe(obj.total_pots) + pots_val;
+            player.break_pb = Math.max(highest_break_val, safe(obj.break_pb));
+            player.frame_win_percentage = Math.min(
+                (safe(obj.games_won) + winner_val) / Math.max(player.games_played, 1),
+                1
+            );
+            player.pot_success_rate = Math.min(
+                (safe(obj.pot_success_rate) + pots_val / Math.max(pots_val + misses_val, 1)) / 2,
+                1
+            );
+            if(player.average_break > 0) {
+                player.average_break = (safe(obj.average_break) + avg_break_val) / 2;
+            } else {
+                player.average_break = avg_break_val;
+            }
+            player.fluke_ratio = Math.min(
+                ((flukes_val / Math.max(pots_val, 1)) + safe(obj.fluke_ratio)) / 2,
+                1
+            );
+            player.wheres_the_cue_ball_going = wtcbg_val + safe(obj.wheres_the_cue_ball_going);
+            player.safety_attack_ratio = Math.min(
+                ((safeties_val / hits_val) + safe(obj.safety_attack_ratio)) / 2,
+                1
+            );
+        });
+        console.log(stats_arr);
+    };
+
+
+}``
 
 function main_session(players, json) {
     let frames_count = 0; frames_arr = [0, 0];
