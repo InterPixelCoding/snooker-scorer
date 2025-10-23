@@ -1,0 +1,60 @@
+[
+    {
+        "username": "Test 1.", 
+        "stats": {
+            "master": {
+                "games_played": 67,
+                "games_won": 25,
+                "total_pots": 561,
+                "break_pb": 92,
+                "frame_win_percentage": 0.37313432835,
+                "pot_success_rate": 0.75,
+                "average_break": 12.7,
+                "fluke_ratio": 0.07,
+                "wheres_the_cue_ball_going": 169,
+                "safety_attack_ratio": 0.32
+            },
+            "20-10-2025-01": {
+                "games_played": 0,
+                "games_won": 0,
+                "total_pots": 0,
+                "break_pb": 0,
+                "frame_win_percentage": 0,
+                "pot_success_rate": 0,
+                "average_break": 0,
+                "fluke_ratio": 0,
+                "wheres_the_cue_ball_going": 0,
+                "safety_attack_ratio": 0
+            }
+        }
+    },
+    {
+        "username": "Test 2.", 
+        "stats": {
+            "master": {
+                "games_played": 1007,
+                "games_won": 569,
+                "total_pots": 1729,
+                "break_pb": 6,
+                "frame_win_percentage": 0.56504468719,
+                "pot_success_rate": 0.67,
+                "average_break": 6.7,
+                "fluke_ratio": 0.067,
+                "wheres_the_cue_ball_going": 67,
+                "safety_attack_ratio": 0.05
+            },
+            "20-10-2025-01": {
+                "games_played": 0,
+                "games_won": 0,
+                "total_pots": 0,
+                "break_pb": 0,
+                "frame_win_percentage": 0,
+                "pot_success_rate": 0,
+                "average_break": 0,
+                "fluke_ratio": 0,
+                "wheres_the_cue_ball_going": 0,
+                "safety_attack_ratio": 0
+            }
+        }
+    }
+]

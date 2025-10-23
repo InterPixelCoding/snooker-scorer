@@ -29,6 +29,35 @@
         }
     },
     {
+        "username": "Samuel L.", 
+        "stats": {
+            "master": {
+                "games_played": 0,
+                "games_won": 0,
+                "total_pots": 0,
+                "break_pb": 0,
+                "frame_win_percentage": 0,
+                "pot_success_rate": 0,
+                "average_break": 0,
+                "fluke_ratio": 0,
+                "wheres_the_cue_ball_going": 0,
+                "safety_attack_ratio": 0
+            },
+            "20-10-2025-01": {
+                "games_played": 0,
+                "games_won": 0,
+                "total_pots": 0,
+                "break_pb": 0,
+                "frame_win_percentage": 0,
+                "pot_success_rate": 0,
+                "average_break": 0,
+                "fluke_ratio": 0,
+                "wheres_the_cue_ball_going": 0,
+                "safety_attack_ratio": 0
+            }
+        }
+    },
+    {
         "username": "Blake W.", 
         "stats": {
             "master": {
