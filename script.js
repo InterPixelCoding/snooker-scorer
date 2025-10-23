@@ -248,6 +248,83 @@ function calculate_average_break(current_player, breaks, average_break, current_
 
 function average(x,y) {return (x+y)/2}
 
+function update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits,) {
+    const winner_index = scores.indexOf(Math.max(...scores));
+    winner[winner_index] = 1;
+
+    average_break[current_player] = calculate_average_break(current_player, breaks, average_break, break_value);
+    highest_breaks[current_player] = Math.max(highest_breaks[current_player], break_value);
+
+    match_stats.players = [players[0].username, players[1].username];
+    match_stats.score = scores;
+    match_stats.winner = players[winner_index].username;
+
+    stats_arr.forEach((player, index) => {
+        const obj = players[index].stats.master;
+        obj.games_played++;
+
+        const safe = v => Number.isFinite(v) ? v : 0;
+        const pots_val = safe(pots[index]);
+        const misses_val = safe(misses[index]);
+        const highest_break_val = safe(highest_breaks[index]);
+        const avg_break_val = safe(average_break[index]);
+        const flukes_val = safe(flukes[index]);
+        const wtcbg_val = safe(wtcbg[index]);
+        const safeties_val = safe(safeties[index]);
+        const hits_val = Math.max(safe(hits[index]), 1);
+        const winner_val = safe(winner[index]);
+        
+        player.games_won = winner[index] + obj.games_won;
+        player.games_played = safe(obj.games_played);
+        player.break_pb = Math.max(highest_break_val, safe(obj.break_pb));
+        player.frame_win_percentage = Math.min(
+            (safe(obj.games_won) + winner_val) / Math.max(player.games_played, 1),
+            1
+        );
+            
+        player.pot_success_rate = Math.min(
+            (safe(obj.pot_success_rate) * safe(obj.total_pots) + pots_val) / safe(obj.total_pots + pots_val + misses_val),
+            1
+        );
+            
+        player.total_pots = safe(obj.total_pots) + pots_val;
+        
+        if(obj.average_break > 0) {
+            player.average_break = (safe(obj.average_break) * (obj.games_played - 1) + avg_break_val) / obj.games_played;
+        } else {
+            player.average_break = avg_break_val;
+        }
+        player.fluke_ratio = Math.min(
+            ((flukes_val / Math.max(pots_val, 1)) + safe(obj.fluke_ratio) * (obj.games_played - 1)) / obj.games_played,
+            1
+        );
+        player.wheres_the_cue_ball_going = wtcbg_val + safe(obj.wheres_the_cue_ball_going);
+        if(obj.games_played > 1) {
+            player.safety_attack_ratio = Math.min(
+                ((safe(safeties_val / hits_val) + (safe(obj.safety_attack_ratio)) * (obj.games_played - 1))) / obj.games_played,
+                1
+            );
+        } else {
+            player.safety_attack_ratio = Math.min(
+                ((safe(safeties_val / hits_val) + (safe(obj.safety_attack_ratio) * (obj.games_played)))) / obj.games_played,
+                1
+            );
+        }
+        
+        let snooker_object = JSON.parse(localStorage.getItem("snooker_scorer_json"));
+        let global_player_index = snooker_object.findIndex(player_obj => player_obj.username === players[index].username);
+
+        let timestamp = new Date();
+        let timestamp_key = timestamp.getTime();
+        let stats = snooker_object[global_player_index].stats;
+        stats[timestamp_key] = player;
+        stats.master = player;
+
+        console.log(snooker_object);
+        localStorage.setItem("snooker_scorer_json", JSON.stringify(snooker_object));
+    });
+}
+
 let score_history = [];
 let history_index = 0;
 let break_value = 0;
@@ -435,81 +512,8 @@ function start_match(players, frames_count, frames_arr) {
     };
 
     end_match.onclick = () => {
-
-        const winner_index = scores.indexOf(Math.max(...scores));
-        winner[winner_index] = 1;
-
-        average_break[current_player] = calculate_average_break(current_player, breaks, average_break, break_value);
-        highest_breaks[current_player] = Math.max(highest_breaks[current_player], break_value);
-
-        match_stats.players = [players[0].username, players[1].username];
-        match_stats.score = scores;
-        match_stats.winner = players[winner_index].username;
-
-        stats_arr.forEach((player, index) => {
-            const obj = players[index].stats.master;
-            obj.games_played++;
-
-            const safe = v => Number.isFinite(v) ? v : 0;
-            const pots_val = safe(pots[index]);
-            const misses_val = safe(misses[index]);
-            const highest_break_val = safe(highest_breaks[index]);
-            const avg_break_val = safe(average_break[index]);
-            const flukes_val = safe(flukes[index]);
-            const wtcbg_val = safe(wtcbg[index]);
-            const safeties_val = safe(safeties[index]);
-            const hits_val = Math.max(safe(hits[index]), 1);
-            const winner_val = safe(winner[index]);
-            
-            player.games_won = winner[index] + obj.games_won;
-            player.games_played = safe(obj.games_played);
-            player.break_pb = Math.max(highest_break_val, safe(obj.break_pb));
-            player.frame_win_percentage = Math.min(
-                (safe(obj.games_won) + winner_val) / Math.max(player.games_played, 1),
-                1
-            );
-                
-            player.pot_success_rate = Math.min(
-                (safe(obj.pot_success_rate) * safe(obj.total_pots) + pots_val) / safe(obj.total_pots + pots_val + misses_val),
-                1
-            );
-                
-            player.total_pots = safe(obj.total_pots) + pots_val;
-            
-            if(obj.average_break > 0) {
-                player.average_break = (safe(obj.average_break) * (obj.games_played - 1) + avg_break_val) / obj.games_played;
-            } else {
-                player.average_break = avg_break_val;
-            }
-            player.fluke_ratio = Math.min(
-                ((flukes_val / Math.max(pots_val, 1)) + safe(obj.fluke_ratio) * (obj.games_played - 1)) / obj.games_played,
-                1
-            );
-            player.wheres_the_cue_ball_going = wtcbg_val + safe(obj.wheres_the_cue_ball_going);
-            if(obj.games_played > 1) {
-                player.safety_attack_ratio = Math.min(
-                    ((safe(safeties_val / hits_val) + (safe(obj.safety_attack_ratio)) * (obj.games_played - 1))) / obj.games_played,
-                    1
-                );
-            } else {
-                player.safety_attack_ratio = Math.min(
-                    ((safe(safeties_val / hits_val) + (safe(obj.safety_attack_ratio) * (obj.games_played)))) / obj.games_played,
-                    1
-                );
-            }
-            
-            let snooker_object = JSON.parse(localStorage.getItem("snooker_scorer_json"));
-            let global_player_index = snooker_object.indexOf(snooker_object.find(player_obj => player_obj.username === players[index].username));
-            let timestamp = new Date();
-            timestamp = `${timestamp.getDate()}-${timestamp.getMonth()}-${timestamp.getFullYear()}`;
-            let stats = snooker_object[global_player_index].stats;
-            stats.timestamp = player;
-            stats.master = player;
-
-            localStorage.setItem("snooker_scorer_json", JSON.stringify(snooker_object));
-        });
-    };
-
+        update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits,)
+    } 
 
 }
 
