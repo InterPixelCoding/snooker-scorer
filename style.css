@@ -57,7 +57,7 @@ button:disabled {
     filter: drop-shadow(var(--drop-shadow));
 }
 
-.selection-menu, .landscape, .portrait {
+.selection-menu, .landscape, .portrait, .player-stats-container {
     position: fixed;
     display: flex;
     flex-direction: column;
@@ -85,5 +85,12 @@ button:disabled {
     .portrait {
         opacity: 0;
         pointer-events: none;
+    }
+}
+
+@media (orientation: portrait) {
+    .force-landscape {
+        transform: translateX(100vw) rotate(90deg);
+        transform-origin: top left;
     }
 }

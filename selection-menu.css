@@ -8,14 +8,17 @@
 }
 
 .selection-menu > .wrapper {
+    position: relative;
     display: flex;
     width: 100%;
     padding-inline: 5vw;
-    height: 100%;
+    z-index: 50;
     align-items: center;
     justify-content: center;
     gap: 5%;
     color: white;
+    max-height: 100%;
+    flex-grow: 1;
 }
 
 .selection-menu:not(.active) {
@@ -72,6 +75,7 @@ span.player:not(.active) {
 }
 
 button > img[src="./caret.svg"] {
+    transition: transform 250ms ease;
     width: .75rem;
 }
 
@@ -85,10 +89,15 @@ button > img[src="./caret.svg"] {
     display: flex;
 }
 
+button > img.active {
+    transform: rotate(180deg);
+}
+
 .decide > * {height: fit-content}
 
 @media (orientation: portrait) {
-    .wrapper {
+    .selection-menu > .wrapper {
         flex-direction: column;
+        gap: 1.125vh;
     }
 }

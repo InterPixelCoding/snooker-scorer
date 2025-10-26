@@ -1,0 +1,41 @@
+.player-stats-container {
+    inset: unset;
+    top: 0;
+    left: 0;
+    margin: 0;
+    background: var(--interface-bg);
+    padding: 2rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stats-wrapper {
+    width: 100%;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
+
+.player-stats-container:not(.active) {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.stats-wrapper > h2 {
+    grid-column: span 3;
+    font-size: 2.125rem;
+    margin-top: .5em;
+    text-decoration: underline;
+}
+
+.stats-wrapper > h4 {font-size: 1.5rem;}
+
+.stats-wrapper > * {
+    width: fit-content;
+}
+ 
+.stats-wrapper > .player-1 {
+    grid-column: 2 / 3;
+}

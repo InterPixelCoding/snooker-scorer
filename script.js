@@ -10,6 +10,9 @@ const redo = document.querySelector(".redo");
 const end_match = document.querySelector(".end-match");
 const end_session = document.querySelector(".end-session");
 const highest_break_spans = document.querySelectorAll(".highest-break");
+const player_stats = document.querySelector(".player-stats");
+const wrapper = document.querySelector(".wrapper");
+const player_stats_container = document.querySelector(".player-stats-container");
 const ball_values = [
     { colour: "red", value: 1 },
     { colour: "yellow", value: 2 },
@@ -21,6 +24,30 @@ const ball_values = [
     { colour: "white", value: null },
     { colour: "safety", value: 0 },
 ];
+
+function el(str) {
+    const [tag, classes] = str.split(".");
+    const dom_el = document.createElement(tag);
+
+    if (classes) {
+        classes.split(",").forEach(class_name => {
+            dom_el.classList.add(class_name.trim());
+        });
+    }
+
+    return dom_el;
+}
+
+Element.prototype.appendChildren = function(...children) {
+    children.forEach(child => {
+        if (child instanceof Node) {
+            this.appendChild(child);
+        } else {
+            this.appendChild(document.createTextNode(child));
+        }
+    });
+    return this;
+};
 
 function activate(el) {
     if(el) {
@@ -159,13 +186,19 @@ async function selection_menu_logic() {
     dropdowns.forEach(function(dropdown, index) {
         const btn = dropdown.parentElement.querySelector("button");
         const player_span = document.querySelectorAll("span.player")[index];
+        let i = 0
 
         btn.onclick = () => {
+            i++;
             if(btn.classList.contains("who-breaks-button")) {
                 setTimeout(() => {
                     dropdown.classList.toggle("active")
                 }, 125);
             } else {
+                btn.querySelector("img").classList.toggle("active");
+                if(i === 1) {
+                    wrapper.style.height = `${wrapper.offsetHeight}px`;
+                }
                 dropdown.classList.toggle("active")
             }
         };
@@ -248,22 +281,52 @@ function calculate_average_break(current_player, breaks, average_break, current_
 
 function average(x,y) {return (x+y)/2}
 
-function update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits,) {
-    const winner_index = scores.indexOf(Math.max(...scores));
-    winner[winner_index] = 1;
+function update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, end_match=true) {
+    
+    let winner_index;
+
+    if(end_match) {
+        winner_index = scores.indexOf(Math.max(...scores));
+        winner[winner_index] = 1;
+        match_stats.winner = players[winner_index].username;
+    }
 
     average_break[current_player] = calculate_average_break(current_player, breaks, average_break, break_value);
     highest_breaks[current_player] = Math.max(highest_breaks[current_player], break_value);
 
     match_stats.players = [players[0].username, players[1].username];
     match_stats.score = scores;
-    match_stats.winner = players[winner_index].username;
+
+    let stats_layout = {
+            "General": {
+                "Highest Break": [],
+                "Total Pots": [],
+                "WTCBG?": []
+            },
+
+            "Frames": {
+                "Frames Won": [],
+                "Frames Played": []
+            },
+
+            "Game Stats": {
+                "Average Break": [],
+                "Pot Probability": [],
+                "Safety : Attack": [],
+                "Fluke probability": []
+            }
+        }   
+    
 
     stats_arr.forEach((player, index) => {
+        
         const obj = players[index].stats.master;
         obj.games_played++;
 
         const safe = v => Number.isFinite(v) ? v : 0;
+
+        // === Derived values (merged safe + obj + val logic) ===
+        const games_played = safe(obj.games_played);
         const pots_val = safe(pots[index]);
         const misses_val = safe(misses[index]);
         const highest_break_val = safe(highest_breaks[index]);
@@ -273,57 +336,120 @@ function update_player_objects(scores, winner, current_player, breaks, average_b
         const safeties_val = safe(safeties[index]);
         const hits_val = Math.max(safe(hits[index]), 1);
         const winner_val = safe(winner[index]);
-        
-        player.games_won = winner[index] + obj.games_won;
-        player.games_played = safe(obj.games_played);
-        player.break_pb = Math.max(highest_break_val, safe(obj.break_pb));
-        player.frame_win_percentage = Math.min(
-            (safe(obj.games_won) + winner_val) / Math.max(player.games_played, 1),
-            1
-        );
-            
-        player.pot_success_rate = Math.min(
-            (safe(obj.pot_success_rate) * safe(obj.total_pots) + pots_val) / safe(obj.total_pots + pots_val + misses_val),
-            1
-        );
-            
-        player.total_pots = safe(obj.total_pots) + pots_val;
-        
-        if(obj.average_break > 0) {
-            player.average_break = (safe(obj.average_break) * (obj.games_played - 1) + avg_break_val) / obj.games_played;
-        } else {
-            player.average_break = avg_break_val;
-        }
-        player.fluke_ratio = Math.min(
-            ((flukes_val / Math.max(pots_val, 1)) + safe(obj.fluke_ratio) * (obj.games_played - 1)) / obj.games_played,
-            1
-        );
-        player.wheres_the_cue_ball_going = wtcbg_val + safe(obj.wheres_the_cue_ball_going);
-        if(obj.games_played > 1) {
-            player.safety_attack_ratio = Math.min(
-                ((safe(safeties_val / hits_val) + (safe(obj.safety_attack_ratio)) * (obj.games_played - 1))) / obj.games_played,
-                1
-            );
-        } else {
-            player.safety_attack_ratio = Math.min(
-                ((safe(safeties_val / hits_val) + (safe(obj.safety_attack_ratio) * (obj.games_played)))) / obj.games_played,
-                1
-            );
-        }
-        
-        let snooker_object = JSON.parse(localStorage.getItem("snooker_scorer_json"));
-        let global_player_index = snooker_object.findIndex(player_obj => player_obj.username === players[index].username);
 
-        let timestamp = new Date();
-        let timestamp_key = timestamp.getTime();
+        // === Player assignments as variables ===
+        const games_played_final = games_played;
+
+        const break_pb = Math.max(highest_break_val, safe(obj.break_pb));
+
+        const games_won = end_match ? winner_val + safe(obj.games_won) : safe(obj.games_won);
+        
+        const frame_win_percentage = end_match
+            ? Math.min((safe(obj.games_won) + winner_val) / Math.max(games_played_final, 1), 1)
+            : safe(obj.frame_win_percentage);
+
+        const pot_success_rate = Math.min(
+            (safe(obj.pot_success_rate) * safe(obj.total_pots) + (pots_val + flukes_val)) /
+            safe(obj.total_pots + pots_val + flukes_val + misses_val),
+            1
+        );
+
+        const total_pots = safe(obj.total_pots) + pots_val;
+
+        const average_break_val = obj.average_break > 0
+            ? (safe(obj.average_break) * (games_played - 1) + avg_break_val) / games_played
+            : avg_break_val;
+
+        const fluke_ratio = Math.min(
+            ((flukes_val / Math.max(pots_val, 1)) + safe(obj.fluke_ratio) * (games_played - 1)) / games_played,
+            1
+        );
+
+        const wheres_the_cue_ball_going = wtcbg_val + safe(obj.wheres_the_cue_ball_going);
+
+        const safety_attack_ratio = Math.min(
+            ((safe(safeties_val / hits_val) + safe(obj.safety_attack_ratio) * (games_played - (games_played > 1 ? 1 : 0)))) / games_played,
+            1
+        );
+
+        // === Assign back to player ===
+        player.games_played = games_played_final;
+        player.break_pb = break_pb;
+        player.games_won = games_won;
+        player.frame_win_percentage = frame_win_percentage;
+        player.pot_success_rate = pot_success_rate;
+        player.total_pots = total_pots;
+        player.average_break = average_break_val;
+        player.fluke_ratio = fluke_ratio;
+        player.wheres_the_cue_ball_going = wheres_the_cue_ball_going;
+        player.safety_attack_ratio = safety_attack_ratio;
+
+        stats_layout.General["Highest Break"].push(break_pb);
+        stats_layout.General["Total Pots"].push(total_pots);
+        stats_layout.General["WTCBG?"].push(wheres_the_cue_ball_going);
+
+        stats_layout.Frames["Frames Played"].push(games_played_final);
+        stats_layout.Frames["Frames Won"].push(games_won);
+
+        stats_layout["Game Stats"]["Average Break"].push(average_break_val);
+        stats_layout["Game Stats"]["Pot Probability"].push(pot_success_rate);
+        stats_layout["Game Stats"]["Safety : Attack"].push(safety_attack_ratio);
+        stats_layout["Game Stats"]["Fluke probability"].push(fluke_ratio);
+
+        let snooker_object = JSON.parse(localStorage.getItem("snooker_scorer_json"));
+        
+        let global_player_index = snooker_object.findIndex(player_obj => player_obj.username === players[index].username);
         let stats = snooker_object[global_player_index].stats;
-        stats[timestamp_key] = player;
+
+        if(end_match) {
+            let timestamp = new Date();
+            let timestamp_key = timestamp.getTime();
+            stats[timestamp_key] = player;
+        } 
+
         stats.master = player;
 
-        console.log(snooker_object);
         localStorage.setItem("snooker_scorer_json", JSON.stringify(snooker_object));
     });
+
+    return stats_layout;
 }
+
+function force_landscape(els = document.querySelectorAll(".force-landscape")) {
+    els.forEach(container => {
+        let pseudo_width = document.body.offsetWidth > document.body.offsetHeight ? document.body.offsetWidth : document.body.offsetHeight;
+        let pseudo_height = document.body.offsetWidth < document.body.offsetHeight ? document.body.offsetWidth : document.body.offsetHeight;
+        container.style.width = `${pseudo_width}px`;
+        container.style.height = `${pseudo_height}px`;
+    })
+}
+
+function update_statistics(layout) {
+    const stats_wrapper = el("div.stats-wrapper");
+    const players = Array.from(document.querySelectorAll(".usernames-container > span")).map(span => span.textContent);
+    const player_1_span = el("span.player-1"); const player_2_span = el("span.player-2");
+    player_1_span.textContent = players[0]; player_2_span.textContent = players[1];
+    stats_wrapper.appendChildren(player_1_span, player_2_span);
+
+    Object.entries(layout).forEach(([category, stats]) => {
+        const category_heading = el(`h2`);
+        category_heading.textContent = category;
+        stats_wrapper.appendChild(category_heading);
+        Object.entries(stats).forEach(([stat, values]) => {
+            let statistic_heading = el(`h4`);
+            statistic_heading.textContent = stat;
+            stats_wrapper.appendChild(statistic_heading);
+            values.forEach(value => {
+                let stat_value = el("span.stat")
+                stat_value.textContent = value;
+                stats_wrapper.appendChild(stat_value);
+            })
+        })
+    })
+    player_stats_container.appendChild(stats_wrapper);
+}   
+
+force_landscape();
 
 let score_history = [];
 let history_index = 0;
@@ -511,9 +637,12 @@ function start_match(players, frames_count, frames_arr) {
         }
     };
 
-    end_match.onclick = () => {
-        update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits,)
+    player_stats.onclick = () => {
+        const stats_layout = update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, false)
+        update_statistics(stats_layout)
+        activate(player_stats_container);
     } 
+    end_match.onclick = () => {update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits)} 
 
 }
 
