@@ -76,6 +76,18 @@ button:disabled {
     margin-top: 1rem;
 }
 
+.close {
+    position: fixed;
+    right: 0;
+    top: 0;
+    margin: 1.5rem;
+    display: grid;
+    padding: unset; background: transparent;
+    width: 1rem;
+}
+
+.close > img {width: 100%; grid-area: 1 / 1;}
+
 @keyframes spin {
     from {transform: rotate(0deg);}
     to {transform: rotate(1080deg);}

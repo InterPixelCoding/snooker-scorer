@@ -281,7 +281,7 @@ function calculate_average_break(current_player, breaks, average_break, current_
 
 function average(x,y) {return (x+y)/2}
 
-function update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, end_match=true) {
+function update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, end_match) {
     
     let winner_index;
 
@@ -298,15 +298,16 @@ function update_player_objects(scores, winner, current_player, breaks, average_b
     match_stats.score = scores;
 
     let stats_layout = {
+            "Frames": {
+                "Frames Won": [],
+                "Frames Played": [],
+                "Frame Win Percentage": []
+            },
+
             "General": {
                 "Highest Break": [],
                 "Total Pots": [],
                 "WTCBG?": []
-            },
-
-            "Frames": {
-                "Frames Won": [],
-                "Frames Played": []
             },
 
             "Game Stats": {
@@ -343,6 +344,8 @@ function update_player_objects(scores, winner, current_player, breaks, average_b
         const break_pb = Math.max(highest_break_val, safe(obj.break_pb));
 
         const games_won = end_match ? winner_val + safe(obj.games_won) : safe(obj.games_won);
+
+        obj.games_won = games_won;
         
         const frame_win_percentage = end_match
             ? Math.min((safe(obj.games_won) + winner_val) / Math.max(games_played_final, 1), 1)
@@ -390,6 +393,7 @@ function update_player_objects(scores, winner, current_player, breaks, average_b
 
         stats_layout.Frames["Frames Played"].push(games_played_final);
         stats_layout.Frames["Frames Won"].push(games_won);
+        stats_layout.Frames["Frames Win Percentage"].push(frame_win_percentage);
 
         stats_layout["Game Stats"]["Average Break"].push(average_break_val);
         stats_layout["Game Stats"]["Pot Probability"].push(pot_success_rate);
@@ -424,7 +428,13 @@ function force_landscape(els = document.querySelectorAll(".force-landscape")) {
     })
 }
 
+function ratio(x) {
+    return `${Math.round(x * 100)} : ${Math.round((1 - x) * 100)}`;
+}
+
 function update_statistics(layout) {
+    console.log(layout)
+    if(document.querySelector(".stats-wrapper")) document.querySelector(".stats-wrapper").remove()
     const stats_wrapper = el("div.stats-wrapper");
     const players = Array.from(document.querySelectorAll(".usernames-container > span")).map(span => span.textContent);
     const player_1_span = el("span.player-1"); const player_2_span = el("span.player-2");
@@ -441,7 +451,19 @@ function update_statistics(layout) {
             stats_wrapper.appendChild(statistic_heading);
             values.forEach(value => {
                 let stat_value = el("span.stat")
-                stat_value.textContent = value;
+                let formatted_value;
+                if(stat.toLowerCase().includes("probability")) {
+                    formatted_value = `${(value * 100).toFixed(1)}%`;
+                } else if (stat.toLowerCase().includes(":")) {
+                    formatted_value = ratio(value);
+                }
+                else if (!Number.isInteger(value)) {
+                    formatted_value = value.toFixed(2);
+                } else {
+                    formatted_value = value;
+                }
+                
+                stat_value.textContent = formatted_value;
                 stats_wrapper.appendChild(stat_value);
             })
         })
@@ -642,7 +664,7 @@ function start_match(players, frames_count, frames_arr) {
         update_statistics(stats_layout)
         activate(player_stats_container);
     } 
-    end_match.onclick = () => {update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits)} 
+    end_match.onclick = () => {update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, true)} 
 
 }
 
