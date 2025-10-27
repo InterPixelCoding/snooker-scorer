@@ -79,26 +79,23 @@ function deactivate(el) {
 }
 
 function modal(text) {
-    const modal_container = document.createElement("div");
-    const modal_text = document.createElement("span");
-    const ok = document.createElement("button");
-    ok.textContent = "Ok!"
-    modal_container.classList.add("modal-container");
-    modal_text.classList.add("modal-text");
+    const modal_container = el("div.modal-container");
+    const modal_text = el("span.modal-text");
+    const ok = el("button");
+
     modal_text.textContent = text;
+    ok.textContent = "Ok!";
+
     modal_container.appendChild(modal_text);
     modal_container.appendChild(ok);
     document.body.appendChild(modal_container);
 
-    setTimeout(() => {
-        activate(modal_container);
-    }, 100);
+    setTimeout(() => activate(modal_container), 100);
+
     ok.onclick = () => {
         deactivate(modal_container);
-        setTimeout(() => {
-            modal_container.remove()
-        }, 500);
-    }
+        setTimeout(() => modal_container.remove(), 500);
+    };
 }
 
 async function sync() {
@@ -279,6 +276,11 @@ function calculate_average_break(current_player, breaks, average_break, current_
     return ((prev_break_average * breaks[current_player]) + current_break) / (breaks[current_player] + 1);
 }
 
+function return_winner_arr(scores) {
+    scores[scores.indexOf(Math.max(...scores))] = 1;
+    return scores;
+}
+
 function average(x,y) {return (x+y)/2}
 
 function update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, end_match) {
@@ -393,7 +395,7 @@ function update_player_objects(scores, winner, current_player, breaks, average_b
 
         stats_layout.Frames["Frames Played"].push(games_played_final);
         stats_layout.Frames["Frames Won"].push(games_won);
-        stats_layout.Frames["Frames Win Percentage"].push(frame_win_percentage);
+        stats_layout.Frames["Frame Win Percentage"].push(frame_win_percentage);
 
         stats_layout["Game Stats"]["Average Break"].push(average_break_val);
         stats_layout["Game Stats"]["Pot Probability"].push(pot_success_rate);
@@ -433,7 +435,6 @@ function ratio(x) {
 }
 
 function update_statistics(layout) {
-    console.log(layout)
     if(document.querySelector(".stats-wrapper")) document.querySelector(".stats-wrapper").remove()
     const stats_wrapper = el("div.stats-wrapper");
     const players = Array.from(document.querySelectorAll(".usernames-container > span")).map(span => span.textContent);
@@ -452,7 +453,7 @@ function update_statistics(layout) {
             values.forEach(value => {
                 let stat_value = el("span.stat")
                 let formatted_value;
-                if(stat.toLowerCase().includes("probability")) {
+                if(stat.toLowerCase().includes("probability") || stat.toLowerCase().includes("percentage")) {
                     formatted_value = `${(value * 100).toFixed(1)}%`;
                 } else if (stat.toLowerCase().includes(":")) {
                     formatted_value = ratio(value);
@@ -471,15 +472,36 @@ function update_statistics(layout) {
     player_stats_container.appendChild(stats_wrapper);
 }   
 
+async function conclude_match(players, frames_count, frames_arr, winner) {
+    frames_count++;
+    const modal_container = el("div.modal-container,conclude-match-modal");
+    const msg = el("h2");
+    msg.textContent = `${winner} Wins!`;
+    const next_frame = el("button.next-frame");
+    const end_session = el("button.end-session");
+    next_frame.textContent = "Next Frame"; end_session.textContent = "End Session";
+    modal_container.appendChildren(msg, next_frame, end_session);
+
+    document.body.appendChild(modal_container);
+    setTimeout(() => {activate(modal_container);}, 125);
+
+    return new Promise((resolve) => {
+        next_frame.onclick = () => {
+            let resolve_obj = {"option": "Next Frame", "frames_count": frames_count, "frames_arr": frames_arr};
+            resolve(resolve_obj);
+        }
+        end_session.onclick = () => {resolve("End Session")}
+    })
+}
+
 force_landscape();
 
 let score_history = [];
 let history_index = 0;
 let break_value = 0;
 
-function start_match(players, frames_count, frames_arr) {
+async function start_match(players, frames_count, frames_arr) {
     const usernames = document.querySelectorAll(".usernames-container > span");
-
     let scores = [0, 0];
     let highest_breaks = [0,0];
     let flukes = [0,0];
@@ -491,6 +513,10 @@ function start_match(players, frames_count, frames_arr) {
     let safeties = [0,0];
     let wtcbg = [0,0];
     let winner = [0,0]; // 1 = winner, 0 = loser
+
+    scores.forEach((score, index) => {
+        update_score(index, score, highest_breaks);
+    });
 
     let current_player = players.indexOf(players[2]);
     score_history = [[0, 0, current_player]];
@@ -664,19 +690,47 @@ function start_match(players, frames_count, frames_arr) {
         update_statistics(stats_layout)
         activate(player_stats_container);
     } 
-    end_match.onclick = () => {update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, true)} 
 
+    return new Promise((resolve) => {
+        end_match.onclick = () => {
+            winner = return_winner_arr(scores);
+            frames_arr[winner.indexOf(1)] += 1;
+            update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, true)
+            conclude_match(players, frames_count, frames_arr, players[winner.indexOf(1)].username).then(option => {
+                const conclude_modal = document.querySelector(".conclude-match-modal")
+                deactivate(conclude_modal)
+                setTimeout(() => {conclude_modal.remove();}, 125);
+                resolve(option)
+            })
+        } 
+    })
 }
 
 function main_session(players, json) {
-    let frames_count = 0; frames_arr = [0, 0];
-    let session_players = []; players.forEach(player => {for(let i = 0; i<json.length; i++) {if(player === json[i].username) {session_players.push(json[i]);}}})
+    let frames_count = 1;
+    let frames_arr = [0, 0];
+    let session_players = [];
+    players.forEach(player => {
+        for (let i = 0; i < json.length; i++) {
+            if (player === json[i].username) {
+                session_players.push(json[i]);
+            }
+        }
+    });
+
     activate([landscape, portrait]);
     deactivate(selection_menu);
 
-    frames_count++;
-    start_match(session_players, frames_count, frames_arr);
-
+    // pass a shallow copy so start_match cannot mutate the original session_players array (start_match calls .pop())
+    (async function runFrames() {
+        let result = await start_match(session_players.slice(), frames_count, frames_arr);
+        while (result && result.option === "Next Frame") {
+            frames_count = result.frames_count;
+            frames_arr = result.frames_arr;
+            result = await start_match(session_players.slice(), frames_count, frames_arr);
+        }
+        console.log(result);
+    })();
 }
 
 window.addEventListener("DOMContentLoaded", () => {
