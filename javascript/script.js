@@ -1,3 +1,5 @@
+// Please fix logic errors to ensure everything works successfully
+
 const dropdowns = document.querySelectorAll(".selection-menu .dropdown");
 const landscape = document.querySelector(".landscape");
 const portrait = document.querySelector(".portrait");
@@ -111,13 +113,13 @@ async function sync() {
                 reject("No file selected");
                 return;
             }
-
             try {
                 const text = await file.text();
                 const json_data = JSON.parse(text);
                 document.querySelector(".sync > img").style.animation = "spin 3s ease forwards";
                 localStorage.setItem("snooker_scorer_json", JSON.stringify(json_data));
                 resolve(json_data);
+                location.reload();
             } catch (err) {
                 reject(`Error reading JSON file: ${err.message}`);
             }
@@ -273,12 +275,38 @@ function update_score_history(scores, current_player) {
 
 function calculate_average_break(current_player, breaks, average_break, current_break) {
     const prev_break_average = average_break[current_player];
-    return ((prev_break_average * breaks[current_player]) + current_break) / (breaks[current_player] + 1);
+    return ((prev_break_average * (breaks[current_player] || 0)) + current_break) / Math.max((breaks[current_player] || 0) + 1, 1);
 }
 
 function return_winner_arr(scores) {
-    scores[scores.indexOf(Math.max(...scores))] = 1;
-    return scores;
+    const winnerIndex = scores.indexOf(Math.max(...scores));
+    const winnerArr = [0, 0];
+    winnerArr[winnerIndex] = 1;
+    return winnerArr;
+}
+
+async function save_to_file(file = "../master.json") {
+    let contents = JSON.parse(localStorage.getItem("snooker_scorer_json"));
+    try {
+        const data = JSON.stringify(contents, null, 2);
+        const handle = await window.showSaveFilePicker({
+            suggestedName: file,
+            types: [
+                {
+                    description: "JSON Files",
+                    accept: { "application/json": [".json"] }
+                }
+            ]
+        });
+
+        const writable = await handle.createWritable();
+        await writable.write(data);
+        await writable.close();
+
+        console.log(`File saved successfully as ${file}`);
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 function average(x,y) {return (x+y)/2}
@@ -318,13 +346,12 @@ function update_player_objects(scores, winner, current_player, breaks, average_b
                 "Safety : Attack": [],
                 "Fluke probability": []
             }
-        }   
+        }
     
 
     stats_arr.forEach((player, index) => {
-        
         const obj = players[index].stats.master;
-        obj.games_played++;
+        obj.games_played += end_match ? 1 : 0;
 
         const safe = v => Number.isFinite(v) ? v : 0;
 
@@ -350,8 +377,8 @@ function update_player_objects(scores, winner, current_player, breaks, average_b
         obj.games_won = games_won;
         
         const frame_win_percentage = end_match
-            ? Math.min((safe(obj.games_won) + winner_val) / Math.max(games_played_final, 1), 1)
-            : safe(obj.frame_win_percentage);
+        ? (safe(obj.games_won) + winner_val) / Math.max(games_played_final, 1)
+        : safe(obj.games_won / games_played_final);
 
         const pot_success_rate = Math.min(
             (safe(obj.pot_success_rate) * safe(obj.total_pots) + (pots_val + flukes_val)) /
@@ -402,20 +429,45 @@ function update_player_objects(scores, winner, current_player, breaks, average_b
         stats_layout["Game Stats"]["Safety : Attack"].push(safety_attack_ratio);
         stats_layout["Game Stats"]["Fluke probability"].push(fluke_ratio);
 
-        let snooker_object = JSON.parse(localStorage.getItem("snooker_scorer_json"));
-        
-        let global_player_index = snooker_object.findIndex(player_obj => player_obj.username === players[index].username);
-        let stats = snooker_object[global_player_index].stats;
+        let snooker_object_raw = localStorage.getItem("snooker_scorer_json");
+        if (!snooker_object_raw) {
+            console.warn("localStorage key 'snooker_scorer_json' not found — skipping write for", players[index] && players[index].username);
+        } else {
+            try {
+                let snooker_object = JSON.parse(snooker_object_raw);
+                let global_player_index = snooker_object.findIndex(player_obj => player_obj.username === players[index].username);
+                if (global_player_index === -1) {
+                    console.warn("Player not found in stored snooker object:", players[index] && players[index].username);
+                } else {
+                    let stats = snooker_object[global_player_index].stats || {};
+                    if (end_match) {
+                        let timestamp = new Date();
+                        let timestamp_key = timestamp.getTime();
+                        // store a snapshot under the timestamp
+                        stats[timestamp_key] = player;
+                    }
 
-        if(end_match) {
-            let timestamp = new Date();
-            let timestamp_key = timestamp.getTime();
-            stats[timestamp_key] = player;
-        } 
+                    // merge updated player stats into master and store
+                    players[index].stats.master = { ...obj, ...player };
+                    stats.master = { ...obj, ...player };
 
-        stats.master = player;
+                    if (end_match) {
+                        let timestamp = Date.now();
+                        stats[timestamp] = { ...obj, ...player };
+                    }
 
-        localStorage.setItem("snooker_scorer_json", JSON.stringify(snooker_object));
+                    // merge with previous snapshots (preserve history)
+                    snooker_object[global_player_index].stats = {
+                        ...(snooker_object[global_player_index].stats || {}),
+                        ...stats
+                    };
+
+                    localStorage.setItem("snooker_scorer_json", JSON.stringify(snooker_object));
+                }
+            } catch (err) {
+                console.error("Error parsing 'snooker_scorer_json' from localStorage:", err);
+            }
+        }
     });
 
     return stats_layout;
@@ -472,7 +524,7 @@ function update_statistics(layout) {
     player_stats_container.appendChild(stats_wrapper);
 }   
 
-async function conclude_match(players, frames_count, frames_arr, winner) {
+async function conclude_match(players, frames_count, frames_arr, winner, starting_player) {
     frames_count++;
     const modal_container = el("div.modal-container,conclude-match-modal");
     const msg = el("h2");
@@ -485,13 +537,35 @@ async function conclude_match(players, frames_count, frames_arr, winner) {
     document.body.appendChild(modal_container);
     setTimeout(() => {activate(modal_container);}, 125);
 
+    let players_arr = players;
+    players_arr.push(players[starting_player]);
+
     return new Promise((resolve) => {
         next_frame.onclick = () => {
-            let resolve_obj = {"option": "Next Frame", "frames_count": frames_count, "frames_arr": frames_arr};
+            let resolve_obj = {
+                "option": "Next Frame", 
+                "frames_count": frames_count, 
+                "frames_arr": frames_arr,
+                "starting_player": starting_player,
+                "players": players_arr
+            };
             resolve(resolve_obj);
         }
-        end_session.onclick = () => {resolve("End Session")}
+        end_session.onclick = () => {
+        save_to_file()
+        .then(() => {location.reload()});
+        }
     })
+}
+
+function null_click(el) {
+    if (Array.isArray(el)) {
+        el.forEach(sub_el => {
+            if (sub_el) sub_el.onclick = null;
+        });
+    } else {
+        if (el) el.onclick = null;
+    }
 }
 
 force_landscape();
@@ -501,6 +575,12 @@ let history_index = 0;
 let break_value = 0;
 
 async function start_match(players, frames_count, frames_arr) {
+    // remove onclick listeners
+    null_click([
+        balls, shot_type,
+        undo, redo, player_stats, end_match
+    ]);
+
     const usernames = document.querySelectorAll(".usernames-container > span");
     let scores = [0, 0];
     let highest_breaks = [0,0];
@@ -514,14 +594,15 @@ async function start_match(players, frames_count, frames_arr) {
     let wtcbg = [0,0];
     let winner = [0,0]; // 1 = winner, 0 = loser
 
-    scores.forEach((score, index) => {
-        update_score(index, score, highest_breaks);
-    });
+    scores.forEach((score, index) => {update_score(index, score, highest_breaks);});
 
     let current_player = players.indexOf(players[2]);
+    let starting_player = Math.abs(1 - current_player); // determines starting player for *next frame*
     score_history = [[0, 0, current_player]];
     history_index = 0;
     players.pop();
+
+    switch_carets(current_player);
 
     // Initialise JSON objects
     let match_stats = {
@@ -530,26 +611,13 @@ async function start_match(players, frames_count, frames_arr) {
         "winner": null
     };
 
-    const empty_arr = {
-        "games_played": 0,
-        "total_pots": 0,
-        "break_pb": 0,
-        "frame_win_percentage": 0,
-        "pot_success_rate": 0,
-        "average_break": 0,
-        "fluke_ratio": 0,
-        "wheres_the_cue_ball_going": 0,
-        "safety_attack_ratio": 0,
-        "games_won": 0
-    };
-
-    let p1_stats = {...empty_arr}; let p2_stats = {...empty_arr};
-
+    let p1_stats = {...players[0].stats.master};
+    let p2_stats = {...players[1].stats.master};
     let stats_arr = [p1_stats, p2_stats];
 
     initialise_scores(usernames, players, current_player, frames_count, frames_arr);
     
-    balls.addEventListener("click", (e) => {
+    balls.onclick = (e) => {
         let shot = (Array.from(shot_type.children)
             .filter(type => type.classList.contains("active")))[0].textContent;
 
@@ -643,9 +711,9 @@ async function start_match(players, frames_count, frames_arr) {
             history_index++;
         }
 
-    })
+    };
 
-    shot_type.addEventListener("click", (e) => {
+    shot_type.onclick = (e) => {
         const spans = Array.from(document.querySelectorAll(".shot-type > span"));
         if (spans.includes(e.target)) {
             deactivate(document.querySelector(".shot-type > span.active"));
@@ -658,7 +726,7 @@ async function start_match(players, frames_count, frames_arr) {
             if (shot === "Foul") deactivate(document.querySelector(".safety"));
             else activate(document.querySelector(".safety"));
         }
-    });
+    };
 
     // === UNDO / REDO ===
     undo.onclick = () => {
@@ -687,7 +755,7 @@ async function start_match(players, frames_count, frames_arr) {
 
     player_stats.onclick = () => {
         const stats_layout = update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, false)
-        update_statistics(stats_layout)
+        update_statistics(stats_layout);
         activate(player_stats_container);
     } 
 
@@ -695,8 +763,9 @@ async function start_match(players, frames_count, frames_arr) {
         end_match.onclick = () => {
             winner = return_winner_arr(scores);
             frames_arr[winner.indexOf(1)] += 1;
-            update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, true)
-            conclude_match(players, frames_count, frames_arr, players[winner.indexOf(1)].username).then(option => {
+            const stats_layout = update_player_objects(scores, winner, current_player, breaks, average_break, break_value, highest_breaks, match_stats, players, stats_arr, pots, misses, flukes, wtcbg, safeties, hits, true)
+            update_statistics(stats_layout)
+            conclude_match(players, frames_count, frames_arr, players[winner.indexOf(1)].username, starting_player).then(option => {
                 const conclude_modal = document.querySelector(".conclude-match-modal")
                 deactivate(conclude_modal)
                 setTimeout(() => {conclude_modal.remove();}, 125);
@@ -722,14 +791,14 @@ function main_session(players, json) {
     deactivate(selection_menu);
 
     // pass a shallow copy so start_match cannot mutate the original session_players array (start_match calls .pop())
-    (async function runFrames() {
+    (async function run_frames() {
         let result = await start_match(session_players.slice(), frames_count, frames_arr);
         while (result && result.option === "Next Frame") {
+            let __session_players = result.players;
             frames_count = result.frames_count;
             frames_arr = result.frames_arr;
-            result = await start_match(session_players.slice(), frames_count, frames_arr);
+            result = await start_match(__session_players, frames_count, frames_arr);
         }
-        console.log(result);
     })();
 }
 
@@ -738,4 +807,8 @@ window.addEventListener("DOMContentLoaded", () => {
     initialise_dropdowns(json);
     selection_menu_logic(json)
     .then(players => main_session(players, json));
+});
+
+window.addEventListener("beforeunload", () => {
+    save_to_file();
 });

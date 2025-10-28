@@ -1,0 +1,41 @@
+# Building a Snooker Scoring App
+## Contents
+- ### Designing
+    - Which features will I include? How will I implement them whilst ensuring clear but minimalist UI / UX?
+        - Player Selection Menu
+        - Score
+        - Scoring System
+        - Player Statistics
+    - Which design style will I choose
+        - Minimalism
+        - Neuemorphism
+        - Skeuomorphism
+        - Multiple Themes, chosen by user
+
+- ### Coding
+    - Which tech stack will I use?
+        - Mobile Framework
+            - Offline Website
+                - WebGUI wrapper
+            - Real app
+                - Native Flutter
+        - Database
+            - JSON accessible through Chrome's new FileAccessAPI
+                - Data would be stored in LocalStorage and updated / loaded optionally upon user request
+            -  Node.js + Express + Localhost
+                - JSON would be updated constantly, ensuring no data loss if LocalStorage is cleared
+                - This framework doesn't have native support for android, Tmux (terminal emulation) would be used to manage express localhost
+            - Google Spreadsheet Database
+                - This would allow multiple devices to access the same data (not a localhost).
+        - Frontend
+            - Vanilla HTML, CSS, Javascript
+            - React, with external components
+                - Maybe not worth talking about, as it's too hard to explain / differentiate frontend frameworks
+    - How will I ensure my code effectively manages different states and asynchronous processes?
+        - Create a flow chart managing all possible program states
+        - Use a consistent object exchange system
+        - Clearly differentiate between global and local objects / variables
+        - Ensure tests are run and passed for every function before main runtime
+            - For example, the function that will calculate player statistics would be given test data, then it's output would be compared to a known correct source.
+
+- ### Publishing

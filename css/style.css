@@ -13,11 +13,12 @@
 }
 
 body {
-    width: 100%;
+    width: 101%;
     height: 100vh;
     overflow: hidden;
     font-family: "Instrument Serif";
     background: var(--interface-bg);
+    overflow: hidden;
 }
 
 button {

@@ -1,53 +1,497 @@
 [
-    {
-        "username": "Silas W.", 
-        "stats": {
-            "master": {
-                "games_played": 0,
-                "games_won": 0,
-                "total_pots": 0,
-                "break_pb": 0,
-                "frame_win_percentage": 0,
-                "pot_success_rate": 0,
-                "average_break": 0,
-                "fluke_ratio": 0,
-                "wheres_the_cue_ball_going": 0,
-                "safety_attack_ratio": 0
-            }
-        }
-    },
-    {
-        "username": "Samuel L.", 
-        "stats": {
-            "master": {
-                "games_played": 0,
-                "games_won": 0,
-                "total_pots": 0,
-                "break_pb": 0,
-                "frame_win_percentage": 0,
-                "pot_success_rate": 0,
-                "average_break": 0,
-                "fluke_ratio": 0,
-                "wheres_the_cue_ball_going": 0,
-                "safety_attack_ratio": 0
-            }
-        }
-    },
-    {
-        "username": "Blake W.", 
-        "stats": {
-            "master": {
-                "games_played": 0,
-                "games_won": 0,
-                "total_pots": 0,
-                "break_pb": 0,
-                "frame_win_percentage": 0,
-                "pot_success_rate": 0.9,
-                "average_break": 0,
-                "fluke_ratio": 0,
-                "wheres_the_cue_ball_going": 0,
-                "safety_attack_ratio": 0
-            }
-        }
+  {
+    "username": "Silas W.",
+    "stats": {
+      "master": {
+        "games_played": 14,
+        "games_won": 6,
+        "total_pots": 8,
+        "break_pb": 9,
+        "frame_win_percentage": 0.42857142857142855,
+        "pot_success_rate": 0.90625,
+        "average_break": 0.3738984417868217,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      },
+      "1761661074392": {
+        "games_played": 1,
+        "games_won": 1,
+        "total_pots": 3,
+        "break_pb": 9,
+        "frame_win_percentage": 2,
+        "pot_success_rate": 0.75,
+        "average_break": 9,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0
+      },
+      "1761661167128": {
+        "games_played": 2,
+        "games_won": 1,
+        "total_pots": 3,
+        "break_pb": 9,
+        "frame_win_percentage": 0.5,
+        "pot_success_rate": 0.75,
+        "average_break": 4.5,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0
+      },
+      "1761661225350": {
+        "games_played": 3,
+        "games_won": 1,
+        "total_pots": 4,
+        "break_pb": 9,
+        "frame_win_percentage": 0.3333333333333333,
+        "pot_success_rate": 0.8125,
+        "average_break": 3.3333333333333335,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0
+      },
+      "1761661304043": {
+        "games_played": 4,
+        "games_won": 1,
+        "total_pots": 5,
+        "break_pb": 9,
+        "frame_win_percentage": 0.25,
+        "pot_success_rate": 0.85,
+        "average_break": 2.75,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0
+      },
+      "1761661304044": {
+        "games_played": 4,
+        "games_won": 1,
+        "total_pots": 5,
+        "break_pb": 9,
+        "frame_win_percentage": 0.25,
+        "pot_success_rate": 0.85,
+        "average_break": 2.75,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0
+      },
+      "1761661383505": {
+        "games_played": 5,
+        "games_won": 2,
+        "total_pots": 5,
+        "break_pb": 9,
+        "frame_win_percentage": 0.6,
+        "pot_success_rate": 0.85,
+        "average_break": 2.2,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0
+      },
+      "1761661410080": {
+        "games_played": 6,
+        "games_won": 3,
+        "total_pots": 5,
+        "break_pb": 9,
+        "frame_win_percentage": 0.6666666666666666,
+        "pot_success_rate": 0.85,
+        "average_break": 1.1733333333333336,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0
+      },
+      "1761661428789": {
+        "games_played": 7,
+        "games_won": 4,
+        "total_pots": 5,
+        "break_pb": 9,
+        "frame_win_percentage": 0.7142857142857143,
+        "pot_success_rate": 0.85,
+        "average_break": 0.6984126984126986,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      },
+      "1761661482818": {
+        "games_played": 8,
+        "games_won": 4,
+        "total_pots": 5,
+        "break_pb": 9,
+        "frame_win_percentage": 0.5,
+        "pot_success_rate": 0.85,
+        "average_break": 0.32986255726780517,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      },
+      "1761662055593": {
+        "games_played": 9,
+        "games_won": 4,
+        "total_pots": 6,
+        "break_pb": 9,
+        "frame_win_percentage": 0.4444444444444444,
+        "pot_success_rate": 0.875,
+        "average_break": 0.4043222731269379,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      },
+      "1761662283236": {
+        "games_played": 10,
+        "games_won": 4,
+        "total_pots": 7,
+        "break_pb": 9,
+        "frame_win_percentage": 0.4,
+        "pot_success_rate": 0.8928571428571429,
+        "average_break": 0.42345781850155034,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      },
+      "1761662337236": {
+        "games_played": 11,
+        "games_won": 4,
+        "total_pots": 7,
+        "break_pb": 9,
+        "frame_win_percentage": 0.36363636363636365,
+        "pot_success_rate": 0.8928571428571429,
+        "average_break": 0.38496165318322756,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      },
+      "1761662397839": {
+        "games_played": 12,
+        "games_won": 5,
+        "total_pots": 7,
+        "break_pb": 9,
+        "frame_win_percentage": 0.5,
+        "pot_success_rate": 0.8928571428571429,
+        "average_break": 0.3528815154179586,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      },
+      "1761662429743": {
+        "games_played": 13,
+        "games_won": 6,
+        "total_pots": 7,
+        "break_pb": 9,
+        "frame_win_percentage": 0.5384615384615384,
+        "pot_success_rate": 0.8928571428571429,
+        "average_break": 0.32573678346273105,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      },
+      "1761662564431": {
+        "games_played": 14,
+        "games_won": 6,
+        "total_pots": 8,
+        "break_pb": 9,
+        "frame_win_percentage": 0.42857142857142855,
+        "pot_success_rate": 0.90625,
+        "average_break": 0.3738984417868217,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      },
+      "1761662564432": {
+        "games_played": 14,
+        "games_won": 6,
+        "total_pots": 8,
+        "break_pb": 9,
+        "frame_win_percentage": 0.42857142857142855,
+        "pot_success_rate": 0.90625,
+        "average_break": 0.3738984417868217,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      }
     }
+  },
+  {
+    "username": "Samuel L.",
+    "stats": {
+      "master": {
+        "games_played": 5,
+        "games_won": 3,
+        "total_pots": 69,
+        "break_pb": 69,
+        "frame_win_percentage": 0.6,
+        "pot_success_rate": 0.9283927582604331,
+        "average_break": 5.861015625,
+        "fluke_ratio": 0.0009375,
+        "wheres_the_cue_ball_going": 5,
+        "safety_attack_ratio": 0.05004585326953748
+      },
+      "1761660809071": {
+        "games_played": 1,
+        "games_won": 1,
+        "total_pots": 0,
+        "break_pb": 0,
+        "frame_win_percentage": 2,
+        "pot_success_rate": null,
+        "average_break": 0,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0
+      },
+      "1761660878953": {
+        "games_played": 2,
+        "games_won": 2,
+        "total_pots": 26,
+        "break_pb": 14,
+        "frame_win_percentage": 1.5,
+        "pot_success_rate": 0.8810064935064935,
+        "average_break": 7.46875,
+        "fluke_ratio": 0.125,
+        "wheres_the_cue_ball_going": 3,
+        "safety_attack_ratio": 0.14646464646464646
+      },
+      "1761660930261": {
+        "games_played": 3,
+        "games_won": 3,
+        "total_pots": 68,
+        "break_pb": 69,
+        "frame_win_percentage": 1.3333333333333333,
+        "pot_success_rate": 0.9273397105877924,
+        "average_break": 32.061197916666664,
+        "fluke_ratio": 0.005208333333333333,
+        "wheres_the_cue_ball_going": 3,
+        "safety_attack_ratio": 0.2780325181640971
+      },
+      "1761661074392": {
+        "games_played": 4,
+        "games_won": 3,
+        "total_pots": 69,
+        "break_pb": 69,
+        "frame_win_percentage": 0.75,
+        "pot_success_rate": 0.9283927582604331,
+        "average_break": 16.280598958333332,
+        "fluke_ratio": 0.0026041666666666665,
+        "wheres_the_cue_ball_going": 3,
+        "safety_attack_ratio": 0.13901625908204854
+      },
+      "1761661428789": {
+        "games_played": 5,
+        "games_won": 3,
+        "total_pots": 69,
+        "break_pb": 69,
+        "frame_win_percentage": 0.6,
+        "pot_success_rate": 0.9283927582604331,
+        "average_break": 7.32626953125,
+        "fluke_ratio": 0.001171875,
+        "wheres_the_cue_ball_going": 5,
+        "safety_attack_ratio": 0.06255731658692185
+      }
+    }
+  },
+  {
+    "username": "Blake W.",
+    "stats": {
+      "master": {
+        "games_played": 15,
+        "games_won": 8,
+        "total_pots": 45,
+        "break_pb": 16,
+        "frame_win_percentage": 0.6,
+        "pot_success_rate": 0.7515446509059879,
+        "average_break": 3.595677083333334,
+        "fluke_ratio": 0.0009570312500000001,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0.02495458984375
+      },
+      "1761660809072": {
+        "games_played": 1,
+        "games_won": 0,
+        "total_pots": 0,
+        "break_pb": 0,
+        "frame_win_percentage": 0,
+        "pot_success_rate": null,
+        "average_break": 0,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0
+      },
+      "1761660878953": {
+        "games_played": 2,
+        "games_won": 0,
+        "total_pots": 9,
+        "break_pb": 8,
+        "frame_win_percentage": 0,
+        "pot_success_rate": 0.8409090909090909,
+        "average_break": 2.7777777777777772,
+        "fluke_ratio": 0.3333333333333333,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0.29166666666666663
+      },
+      "1761660878954": {
+        "games_played": 2,
+        "games_won": 0,
+        "total_pots": 9,
+        "break_pb": 8,
+        "frame_win_percentage": 0,
+        "pot_success_rate": 0.8409090909090909,
+        "average_break": 2.7777777777777772,
+        "fluke_ratio": 0.3333333333333333,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0.29166666666666663
+      },
+      "1761660930261": {
+        "games_played": 3,
+        "games_won": 0,
+        "total_pots": 21,
+        "break_pb": 11,
+        "frame_win_percentage": 0,
+        "pot_success_rate": 0.715749467923381,
+        "average_break": 3.407407407407407,
+        "fluke_ratio": 0.013888888888888888,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0.36215277777777777
+      },
+      "1761661167129": {
+        "games_played": 4,
+        "games_won": 1,
+        "total_pots": 23,
+        "break_pb": 11,
+        "frame_win_percentage": 0.5,
+        "pot_success_rate": 0.740466905495261,
+        "average_break": 4.555555555555555,
+        "fluke_ratio": 0.010416666666666666,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0.2716145833333333
+      },
+      "1761661225351": {
+        "games_played": 5,
+        "games_won": 2,
+        "total_pots": 25,
+        "break_pb": 11,
+        "frame_win_percentage": 0.6,
+        "pot_success_rate": 0.7319514933227308,
+        "average_break": 5.2444444444444445,
+        "fluke_ratio": 0.008333333333333333,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0.21729166666666666
+      },
+      "1761661304044": {
+        "games_played": 6,
+        "games_won": 3,
+        "total_pots": 28,
+        "break_pb": 11,
+        "frame_win_percentage": 0.6666666666666666,
+        "pot_success_rate": 0.7344409425195955,
+        "average_break": 5.87037037037037,
+        "fluke_ratio": 0.006944444444444444,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0.18107638888888888
+      },
+      "1761661383505": {
+        "games_played": 7,
+        "games_won": 3,
+        "total_pots": 28,
+        "break_pb": 11,
+        "frame_win_percentage": 0.42857142857142855,
+        "pot_success_rate": 0.7344409425195954,
+        "average_break": 5.031746031746032,
+        "fluke_ratio": 0.005952380952380952,
+        "wheres_the_cue_ball_going": 0,
+        "safety_attack_ratio": 0.15520833333333334
+      },
+      "1761661410080": {
+        "games_played": 8,
+        "games_won": 3,
+        "total_pots": 28,
+        "break_pb": 11,
+        "frame_win_percentage": 0.375,
+        "pot_success_rate": 0.7344409425195954,
+        "average_break": 3.2346938775510203,
+        "fluke_ratio": 0.003826530612244898,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0.09977678571428572
+      },
+      "1761661482818": {
+        "games_played": 9,
+        "games_won": 4,
+        "total_pots": 36,
+        "break_pb": 16,
+        "frame_win_percentage": 0.5555555555555556,
+        "pot_success_rate": 0.7518911420946417,
+        "average_break": 3.018771701388889,
+        "fluke_ratio": 0.0019938151041666665,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0.05198872884114584
+      },
+      "1761662055593": {
+        "games_played": 10,
+        "games_won": 5,
+        "total_pots": 38,
+        "break_pb": 16,
+        "frame_win_percentage": 0.6,
+        "pot_success_rate": 0.7453354132155666,
+        "average_break": 3.2150173611111112,
+        "fluke_ratio": 0.0015950520833333333,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0.04159098307291667
+      },
+      "1761662283236": {
+        "games_played": 11,
+        "games_won": 6,
+        "total_pots": 42,
+        "break_pb": 16,
+        "frame_win_percentage": 0.6363636363636364,
+        "pot_success_rate": 0.7516917605160821,
+        "average_break": 4.085014204545455,
+        "fluke_ratio": 0.0013050426136363635,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0.03402898615056818
+      },
+      "1761662337237": {
+        "games_played": 12,
+        "games_won": 7,
+        "total_pots": 43,
+        "break_pb": 16,
+        "frame_win_percentage": 0.6666666666666666,
+        "pot_success_rate": 0.7574663707366383,
+        "average_break": 3.8279296875000006,
+        "fluke_ratio": 0.0011962890624999999,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0.0311932373046875
+      },
+      "1761662397840": {
+        "games_played": 13,
+        "games_won": 7,
+        "total_pots": 43,
+        "break_pb": 16,
+        "frame_win_percentage": 0.5384615384615384,
+        "pot_success_rate": 0.7574663707366383,
+        "average_break": 3.533473557692308,
+        "fluke_ratio": 0.001104266826923077,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0.028793757512019232
+      },
+      "1761662429743": {
+        "games_played": 14,
+        "games_won": 7,
+        "total_pots": 43,
+        "break_pb": 16,
+        "frame_win_percentage": 0.5,
+        "pot_success_rate": 0.7574663707366383,
+        "average_break": 3.2810825892857145,
+        "fluke_ratio": 0.001025390625,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0.026737060546875
+      },
+      "1761662564432": {
+        "games_played": 15,
+        "games_won": 8,
+        "total_pots": 45,
+        "break_pb": 16,
+        "frame_win_percentage": 0.6,
+        "pot_success_rate": 0.7515446509059879,
+        "average_break": 3.595677083333334,
+        "fluke_ratio": 0.0009570312500000001,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0.02495458984375
+      }
+    }
+  }
 ]
