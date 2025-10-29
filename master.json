@@ -3,16 +3,16 @@
     "username": "Silas W.",
     "stats": {
       "master": {
-        "games_played": 14,
-        "games_won": 6,
-        "total_pots": 8,
+        "games_played": 17,
+        "games_won": 7,
+        "total_pots": 16,
         "break_pb": 9,
-        "frame_win_percentage": 0.42857142857142855,
-        "pot_success_rate": 0.90625,
-        "average_break": 0.3738984417868217,
-        "fluke_ratio": 0,
-        "wheres_the_cue_ball_going": 6,
-        "safety_attack_ratio": 0
+        "frame_win_percentage": 0.47058823529411764,
+        "pot_success_rate": 0.9299242424242425,
+        "average_break": 1.291148683207221,
+        "fluke_ratio": 0.39215686274509803,
+        "wheres_the_cue_ball_going": 7,
+        "safety_attack_ratio": 0.04120193531958238
       },
       "1761661074392": {
         "games_played": 1,
@@ -205,6 +205,42 @@
         "fluke_ratio": 0,
         "wheres_the_cue_ball_going": 6,
         "safety_attack_ratio": 0
+      },
+      "1761673274593": {
+        "games_played": 15,
+        "games_won": 6,
+        "total_pots": 11,
+        "break_pb": 9,
+        "frame_win_percentage": 0.4,
+        "pot_success_rate": 0.9318181818181818,
+        "average_break": 0.4961373174379661,
+        "fluke_ratio": 0,
+        "wheres_the_cue_ball_going": 6,
+        "safety_attack_ratio": 0
+      },
+      "1761688607147": {
+        "games_played": 16,
+        "games_won": 6,
+        "total_pots": 16,
+        "break_pb": 9,
+        "frame_win_percentage": 0.375,
+        "pot_success_rate": 0.9299242424242425,
+        "average_break": 0.9343454759076723,
+        "fluke_ratio": 0.4166666666666667,
+        "wheres_the_cue_ball_going": 7,
+        "safety_attack_ratio": 0.04377705627705628
+      },
+      "1761688615483": {
+        "games_played": 17,
+        "games_won": 7,
+        "total_pots": 16,
+        "break_pb": 9,
+        "frame_win_percentage": 0.47058823529411764,
+        "pot_success_rate": 0.9299242424242425,
+        "average_break": 1.291148683207221,
+        "fluke_ratio": 0.39215686274509803,
+        "wheres_the_cue_ball_going": 7,
+        "safety_attack_ratio": 0.04120193531958238
       }
     }
   },
@@ -289,16 +325,16 @@
     "username": "Blake W.",
     "stats": {
       "master": {
-        "games_played": 15,
-        "games_won": 8,
-        "total_pots": 45,
+        "games_played": 18,
+        "games_won": 10,
+        "total_pots": 61,
         "break_pb": 16,
-        "frame_win_percentage": 0.6,
-        "pot_success_rate": 0.7515446509059879,
-        "average_break": 3.595677083333334,
-        "fluke_ratio": 0.0009570312500000001,
-        "wheres_the_cue_ball_going": 4,
-        "safety_attack_ratio": 0.02495458984375
+        "frame_win_percentage": 0.5555555555555556,
+        "pot_success_rate": 0.7549396182828172,
+        "average_break": 4.363850685402199,
+        "fluke_ratio": 0.072948568838614,
+        "wheres_the_cue_ball_going": 7,
+        "safety_attack_ratio": 0.04670858524463795
       },
       "1761660809072": {
         "games_played": 1,
@@ -491,6 +527,42 @@
         "fluke_ratio": 0.0009570312500000001,
         "wheres_the_cue_ball_going": 4,
         "safety_attack_ratio": 0.02495458984375
+      },
+      "1761673274593": {
+        "games_played": 16,
+        "games_won": 9,
+        "total_pots": 54,
+        "break_pb": 16,
+        "frame_win_percentage": 0.625,
+        "pot_success_rate": 0.751214205393204,
+        "average_break": 4.586469618055556,
+        "fluke_ratio": 0.0007815755208333333,
+        "wheres_the_cue_ball_going": 4,
+        "safety_attack_ratio": 0.02037958170572917
+      },
+      "1761688607148": {
+        "games_played": 17,
+        "games_won": 10,
+        "total_pots": 61,
+        "break_pb": 16,
+        "frame_win_percentage": 0.6470588235294118,
+        "pot_success_rate": 0.7549396182828172,
+        "average_break": 4.620547784543505,
+        "fluke_ratio": 0.07723966112323835,
+        "wheres_the_cue_ball_going": 7,
+        "safety_attack_ratio": 0.04945614908255783
+      },
+      "1761688615483": {
+        "games_played": 18,
+        "games_won": 10,
+        "total_pots": 61,
+        "break_pb": 16,
+        "frame_win_percentage": 0.5555555555555556,
+        "pot_success_rate": 0.7549396182828172,
+        "average_break": 4.363850685402199,
+        "fluke_ratio": 0.072948568838614,
+        "wheres_the_cue_ball_going": 7,
+        "safety_attack_ratio": 0.04670858524463795
       }
     }
   }
